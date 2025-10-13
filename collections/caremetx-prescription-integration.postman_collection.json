@@ -1,0 +1,470 @@
+{
+    "info": {
+        "name": "Caremetx Prescription Integration",
+        "description": "Automated test scenarios for POST /api/v1/caremetx/prescription-integration covering success, validation, and security cases.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "version": "1.0.0"
+    },
+    "item": [
+        {
+            "name": "Valid Prescription Submission",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "ApiKey {{apiKey}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "caremetx",
+                        "prescription-integration"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"clientId\": 1,\n  \"programId\": 1,\n  \"prescription\": {\n    \"prescriptionNumber\": \"123456\",\n    \"ndc\": \"122345\",\n    \"quantity\": 2,\n    \"dosage\": \"500 grams\",\n    \"refillsNumber\": 2,\n    \"fillsMade\": 0,\n    \"refillsRemaining\": 2,\n    \"dispenseAsWritten\": true,\n    \"physicianSignature\": true,\n    \"physicianSignatureDate\": \"2025-09-29T13:09:08.758Z\",\n    \"expirationDate\": \"2025-09-29T13:09:08.758Z\",\n    \"daysSupply\": 30,\n    \"lastDispenseDate\": \"2025-09-29T13:09:08.758Z\",\n    \"nextAvailableRefillDate\": \"2025-09-29T13:09:08.758Z\",\n    \"source\": \"Source of Rx\"\n  },\n  \"patient\": {\n    \"patientId\": 313,\n    \"firstName\": \"Steve\",\n    \"lastName\": \"testPhys\",\n    \"dateOfBirth\": \"1980-09-29T13:09:08.758Z\",\n    \"gender\": 1,\n    \"languageId\": -1,\n    \"email\": \"user@example2.com\",\n    \"addresses\": [\n      {\n        \"type\": 0,\n        \"streetAddress\": \"14 Jessica Ct\",\n        \"city\": \"Taylosrville\",\n        \"state\": 26,\n        \"zipCode\": \"40071\",\n        \"addressExtension\": \"\"\n      }\n    ],\n    \"phones\": [\n      {\n        \"number\": \"5028021481\",\n        \"type\": 0,\n        \"extension\": \"\"\n      }\n    ]\n  },\n  \"physician\": {\n    \"npiNumber\": \"1234567891\",\n    \"firstName\": \"Some\",\n    \"lastName\": \"Guy\",\n    \"specialtyCode\": \"ENT\",\n    \"specialtyName\": \"Ear nose throat\",\n    \"addresses\": [\n      {\n        \"name\": \"Office\",\n        \"streetAddress\": \"123 Main St\",\n        \"city\": \"Louisville\",\n        \"state\": 21,\n        \"zipCode\": \"21811\",\n        \"addressExtension\": \"\"\n      }\n    ],\n    \"phones\": [\n      {\n        \"number\": \"7331933550\",\n        \"type\": 1,\n        \"extension\": \"\"\n      }\n    ]\n  }\n}"
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Status code indicates success', function () {",
+                            "    pm.expect([200, 201, 204]).to.include(pm.response.code);",
+                            "});",
+                            "",
+                            "pm.test('Response headers are appropriate', function () {",
+                            "    if (pm.response.code !== 204) {",
+                            "        pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                            "    }",
+                            "});",
+                            "",
+                            "if (pm.response.code !== 204 && pm.response.text()) {",
+                            "    const json = pm.response.json();",
+                            "    pm.test('Response body is an object', function () {",
+                            "        pm.expect(json).to.be.an('object');",
+                            "    });",
+                            "    pm.test('Response includes status or message', function () {",
+                            "        pm.expect(Object.keys(json)).to.include.oneOf(['status', 'message', 'data']);",
+                            "    });",
+                            "}"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Duplicate Submission Should Update",
+            "event": [
+                {
+                    "listen": "prerequest",
+                    "script": {
+                        "exec": [
+                            "// Optionally delay to allow previous create to finish",
+                            "setTimeout(() => {}, 0);"
+                        ],
+                        "type": "text/javascript"
+                    }
+                },
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Duplicate submission returns success', function () {",
+                            "    pm.expect([200, 204]).to.include(pm.response.code);",
+                            "});",
+                            "",
+                            "if (pm.response.text()) {",
+                            "    const json = pm.response.json();",
+                            "    pm.test('Duplicate response describes update or success', function () {",
+                            "        pm.expect(json).to.be.an('object');",
+                            "        pm.expect(json).to.have.any.keys('message', 'status');",
+                            "    });",
+                            "}",
+                            "",
+                            "pm.test('No duplicate entities indicator', function () {",
+                            "    if (pm.response.text()) {",
+                            "        const json = pm.response.json();",
+                            "        pm.expect(JSON.stringify(json).toLowerCase()).to.not.include('duplicate error');",
+                            "    }",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "ApiKey {{apiKey}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "caremetx",
+                        "prescription-integration"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"clientId\": 1,\n  \"programId\": 1,\n  \"prescription\": {\n    \"prescriptionNumber\": \"123456\",\n    \"ndc\": \"122345\",\n    \"quantity\": 2,\n    \"dosage\": \"500 grams\",\n    \"refillsNumber\": 2,\n    \"fillsMade\": 1,\n    \"refillsRemaining\": 1,\n    \"dispenseAsWritten\": true,\n    \"physicianSignature\": true,\n    \"physicianSignatureDate\": \"2025-09-29T13:09:08.758Z\",\n    \"expirationDate\": \"2025-09-29T13:09:08.758Z\",\n    \"daysSupply\": 30,\n    \"lastDispenseDate\": \"2025-10-15T13:09:08.758Z\",\n    \"nextAvailableRefillDate\": \"2025-11-15T13:09:08.758Z\",\n    \"source\": \"Electronic\"\n  },\n  \"patient\": {\n    \"patientId\": 313,\n    \"firstName\": \"Steve\",\n    \"lastName\": \"testPhys\",\n    \"dateOfBirth\": \"1980-09-29T13:09:08.758Z\",\n    \"gender\": 1,\n    \"languageId\": -1,\n    \"email\": \"user@example2.com\",\n    \"addresses\": [\n      {\n        \"type\": 0,\n        \"streetAddress\": \"14 Jessica Ct\",\n        \"city\": \"Taylosrville\",\n        \"state\": 26,\n        \"zipCode\": \"40071\",\n        \"addressExtension\": \"Apt 2\"\n      }\n    ],\n    \"phones\": [\n      {\n        \"number\": \"5028021481\",\n        \"type\": 0,\n        \"extension\": \"\"\n      }\n    ]\n  },\n  \"physician\": {\n    \"npiNumber\": \"1234567891\",\n    \"firstName\": \"Some\",\n    \"lastName\": \"Guy\",\n    \"specialtyCode\": \"ENT\",\n    \"specialtyName\": \"Ear nose throat\",\n    \"addresses\": [\n      {\n        \"name\": \"Office\",\n        \"streetAddress\": \"123 Main St\",\n        \"city\": \"Louisville\",\n        \"state\": 21,\n        \"zipCode\": \"21811\",\n        \"addressExtension\": \"Suite 200\"\n      }\n    ],\n    \"phones\": [\n      {\n        \"number\": \"7331933550\",\n        \"type\": 1,\n        \"extension\": \"\"\n      }\n    ]\n  }\n}"
+                }
+            }
+        },
+        {
+            "name": "Missing Required Field",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "ApiKey {{apiKey}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "caremetx",
+                        "prescription-integration"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"clientId\": 1,\n  \"programId\": 1,\n  \"prescription\": {\n    \"prescriptionNumber\": \"123456\",\n    \"ndc\": \"122345\",\n    \"quantity\": 2\n  },\n  \"patient\": {\n    \"patientId\": 313,\n    \"firstName\": \"Steve\",\n    \"dateOfBirth\": \"1980-09-29T13:09:08.758Z\",\n    \"gender\": 1\n  },\n  \"physician\": {\n    \"npiNumber\": \"1234567891\",\n    \"firstName\": \"Some\",\n    \"lastName\": \"Guy\"\n  }\n}"
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Missing required field returns 400', function () {",
+                            "    pm.expect(pm.response.code).to.eql(400);",
+                            "});",
+                            "",
+                            "const bodyText = pm.response.text();",
+                            "if (bodyText) {",
+                            "    const json = pm.response.json();",
+                            "    pm.test('Error response contains descriptive message', function () {",
+                            "        pm.expect(json).to.be.an('object');",
+                            "        pm.expect(JSON.stringify(json).toLowerCase()).to.include('last name');",
+                            "    });",
+                            "    pm.test('Error payload structure matches API standards', function () {",
+                            "        pm.expect(json).to.have.any.keys('errors', 'message', 'status');",
+                            "    });",
+                            "}",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Invalid Data Type",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "ApiKey {{apiKey}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "caremetx",
+                        "prescription-integration"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"clientId\": \"one\",\n  \"programId\": 1,\n  \"prescription\": {\n    \"prescriptionNumber\": \"123456\",\n    \"ndc\": \"122345\",\n    \"quantity\": \"two\"\n  },\n  \"patient\": {\n    \"patientId\": \"ABC\",\n    \"firstName\": \"Steve\",\n    \"lastName\": \"testPhys\",\n    \"dateOfBirth\": \"not-a-date\",\n    \"gender\": \"male\"\n  },\n  \"physician\": {\n    \"npiNumber\": \"not-a-npi\",\n    \"firstName\": \"Some\",\n    \"lastName\": \"Guy\"\n  }\n}"
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Invalid data types return 400', function () {",
+                            "    pm.expect(pm.response.code).to.eql(400);",
+                            "});",
+                            "",
+                            "if (pm.response.text()) {",
+                            "    const json = pm.response.json();",
+                            "    pm.test('Error details mention invalid format', function () {",
+                            "        pm.expect(JSON.stringify(json).toLowerCase()).to.include.oneOf(['format', 'type', 'invalid']);",
+                            "    });",
+                            "}",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Invalid Program Identifier",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "ApiKey {{apiKey}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "caremetx",
+                        "prescription-integration"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"clientId\": 1,\n  \"programId\": 9999,\n  \"prescription\": {\n    \"prescriptionNumber\": \"123456\",\n    \"ndc\": \"122345\",\n    \"quantity\": 2\n  },\n  \"patient\": {\n    \"patientId\": 313,\n    \"firstName\": \"Steve\",\n    \"lastName\": \"testPhys\",\n    \"dateOfBirth\": \"1980-09-29T13:09:08.758Z\"\n  },\n  \"physician\": {\n    \"npiNumber\": \"1234567891\",\n    \"firstName\": \"Some\",\n    \"lastName\": \"Guy\"\n  }\n}"
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Unknown program or client returns 400 or 404', function () {",
+                            "    pm.expect([400, 404]).to.include(pm.response.code);",
+                            "});",
+                            "if (pm.response.text()) {",
+                            "    const json = pm.response.json();",
+                            "    pm.test('Error references program or client', function () {",
+                            "        pm.expect(JSON.stringify(json).toLowerCase()).to.include.oneOf(['program', 'client']);",
+                            "    });",
+                            "}",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Unauthorized - Missing API Key",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "caremetx",
+                        "prescription-integration"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"clientId\": 1,\n  \"programId\": 1,\n  \"prescription\": {\n    \"prescriptionNumber\": \"123456\"\n  },\n  \"patient\": {\n    \"patientId\": 313,\n    \"firstName\": \"Steve\",\n    \"lastName\": \"testPhys\"\n  },\n  \"physician\": {\n    \"npiNumber\": \"1234567891\",\n    \"firstName\": \"Some\",\n    \"lastName\": \"Guy\"\n  }\n}"
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Missing API key returns 401', function () {",
+                            "    pm.expect(pm.response.code).to.eql(401);",
+                            "});",
+                            "if (pm.response.text()) {",
+                            "    const json = pm.response.json();",
+                            "    pm.test('Error message indicates authentication failure', function () {",
+                            "        pm.expect(JSON.stringify(json).toLowerCase()).to.include.oneOf(['unauthorized', 'api key']);",
+                            "    });",
+                            "}",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Unauthorized - Invalid API Key",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "ApiKey {{invalidApiKey}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "caremetx",
+                        "prescription-integration"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"clientId\": 1,\n  \"programId\": 1,\n  \"prescription\": {\n    \"prescriptionNumber\": \"123456\"\n  },\n  \"patient\": {\n    \"patientId\": 313,\n    \"firstName\": \"Steve\",\n    \"lastName\": \"testPhys\"\n  },\n  \"physician\": {\n    \"npiNumber\": \"1234567891\",\n    \"firstName\": \"Some\",\n    \"lastName\": \"Guy\"\n  }\n}"
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Invalid API key returns 401', function () {",
+                            "    pm.expect(pm.response.code).to.eql(401);",
+                            "});",
+                            "if (pm.response.text()) {",
+                            "    const json = pm.response.json();",
+                            "    pm.test('Error indicates invalid credentials', function () {",
+                            "        pm.expect(JSON.stringify(json).toLowerCase()).to.include.oneOf(['invalid', 'unauthorized', 'api key']);",
+                            "    });",
+                            "}",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Unauthorized - Empty API Key",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "ApiKey "
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "v1",
+                        "caremetx",
+                        "prescription-integration"
+                    ]
+                },
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"clientId\": 1,\n  \"programId\": 1,\n  \"prescription\": {\n    \"prescriptionNumber\": \"123456\"\n  },\n  \"patient\": {\n    \"patientId\": 313,\n    \"firstName\": \"Steve\",\n    \"lastName\": \"testPhys\"\n  },\n  \"physician\": {\n    \"npiNumber\": \"1234567891\",\n    \"firstName\": \"Some\",\n    \"lastName\": \"Guy\"\n  }\n}"
+                }
+            },
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test('Empty API key returns 401', function () {",
+                            "    pm.expect(pm.response.code).to.eql(401);",
+                            "});",
+                            "if (pm.response.text()) {",
+                            "    const json = pm.response.json();",
+                            "    pm.test('Error indicates missing credentials', function () {",
+                            "        pm.expect(JSON.stringify(json).toLowerCase()).to.include.oneOf(['missing', 'unauthorized', 'api key']);",
+                            "    });",
+                            "}",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "https://example.p3.api"
+        },
+        {
+            "key": "apiKey",
+            "value": "{{PLACEHOLDER_VALID_API_KEY}}"
+        },
+        {
+            "key": "invalidApiKey",
+            "value": "INVALID-KEY"
+        }
+    ]
+}
