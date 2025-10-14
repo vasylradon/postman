@@ -1,0 +1,87 @@
+#,Scenario,Preconditions,Steps,Expected Results,Status,Notes
+1,Successful new prescription ingestion,"Target client/program configured; no matching patient, physician, or facility records exist in P3","1. Send the fully populated 'Happy Path - Create All' Postman request.
+2. Query P3 to confirm patient, physician, facility, case, and prescription creation.
+3. Verify associations between created entities.","HTTP 201/200/204 response per implementation; body matches success schema; new patient/physician/facility/case/prescription persisted with ExternalReferenceId mapped and linked correctly.",,
+2,Patient update on existing match,"Existing patient for client/program with same first name, last name, DOB; no conflicting identifiers","1. Seed patient record in P3 with baseline values.
+2. Send 'Patient Update - Demographics' Postman request containing revised fields.
+3. Re-query patient profile.","HTTP 200/204; patient fields updated in place; ExternalReferenceId equals incoming patientId; no duplicate patient created.",,
+3,Physician update on existing NPI,"Physician with matching NPI already stored in P3","1. Seed physician baseline data.
+2. Issue 'Physician Update' Postman request with altered specialty/phone/address.
+3. Inspect physician profile after execution.","HTTP 200/204; physician properties refreshed; NPI deduplication maintained; facility associations intact.",,
+4,Facility deduplication,"Facility record exists for same Address1, State, 5-digit Zip; physician linked","1. Seed facility and link to physician.
+2. Execute 'Facility Update' request with new optional data (e.g., phone, address extension).
+3. Check facility record and association.","HTTP 200/204; facility updated instead of duplicated; linkage to physician persists.",,
+5,Case creation for new patient,"No pre-existing patient for identifiers; case workflows enabled","1. Send happy-path create request for new patient.
+2. Review P3 case list tied to patient.
+3. Validate workflow kick-off per Idorsia rules (logs/flags).","New case created for patient; case linked to prescription; workflow event triggered/queued.",,
+6,Prescription creation for each call,"Existing patient/case context available (newly created or existing)","1. Ensure patient/case exist.
+2. Submit prescription payload for same identifiers.
+3. Validate prescription repository and product mapping.","New prescription entry created for every call; associated with case; NDC resolved to product or flagged appropriately.",,
+7,Duplicate prescription handling,"Prior call ingested identical prescription data","1. Execute happy-path request.
+2. Re-send identical payload.
+3. Inspect patient/physician/facility/prescription records for duplication behavior.","First call creates entities; second call updates according to design (e.g., idempotent or creates new Rx per requirements); no unintended duplicates.",,
+8,Missing required field (patient last name),None,"1. Remove patient.lastName from happy-path payload.
+2. Send request.","HTTP 400; response follows RFC 7807 schema; error references 'Patient.LastName' missing.",,
+9,Invalid field format (phone number),None,"1. Set patient phone to alphabetic string.
+2. Send request.","HTTP 400; RFC 7807 payload citing phone format validation failure.",,
+10,Invalid enumeration/identifier,None,"1. Supply unsupported state value or non-numeric programId.
+2. Execute request.","HTTP 400; descriptive validation error referencing offending field(s).",,
+11,Unauthorized request (no API key),None,"1. Remove Authorization header.
+2. Send request.","HTTP 401 (or 403 per implementation); error envelope consistent across auth failures.",,
+12,Unauthorized request (invalid API key),None,"1. Set Authorization: ApiKey invalid-token.
+2. Send request.","HTTP 401/403; response indicates invalid credentials; no data mutation.",,
+13,Unauthorized request (empty API key value),None,"1. Set Authorization: ApiKey (blank).
+2. Send request.","HTTP 401/403 with consistent error messaging; nothing persisted.",,
+14,Payload schema validation,None,"1. Change patientId to string value.
+2. Submit request.","HTTP 400; validation message highlighting incorrect data type.",,
+15,Graceful handling of empty optional sections,"Optional arrays (addresses/phones) not required by contract","1. Remove physician.addresses and patient.phones but keep required fields.
+2. Send request.","HTTP 200/204; request processed; optional data absent in P3 or left unchanged.",,
+16,Missing top-level object validation,None,"1. Submit payload omitting entire prescription object.
+2. Send request.","HTTP 400; errors list 'Prescription' required; no processing performed.",,
+17,Client/program mismatch,"ClientId/programId in payload do not correspond to authorized Caremetx mapping","1. Modify clientId/programId to mismatched combination.
+2. Execute request.","HTTP 400/403 with error explaining mismatch; no downstream changes.",,
+18,Unsupported HTTP method,None,"1. Invoke endpoint with PUT (or GET) using same headers.","HTTP 405 with Allow header listing supported methods.",,
+19,Unsupported media type,None,"1. Send request with Content-Type: text/plain.
+2. Body contains valid JSON.","HTTP 415 (or equivalent); error message indicates unsupported media type.",,
+20,Large payload resilience,"Payload close to maximum expected size (multiple addresses/phones, long strings within limits)","1. Construct payload hitting size/length edges.
+2. Submit request.
+3. Monitor latency and response.","HTTP 200/204; processing completes within performance expectations; no truncation errors.",,
+21,Retry/idempotency via transactionId,"System receives retry from Caremetx with same transactionId","1. Send payload with transactionId X.
+2. Re-send same payload quickly.
+3. Observe logs/state.","Endpoint handles retry gracefully (idempotent or duplicate-safe); response consistent; no unintended side effects.",,
+22,Partial downstream failure handling,"Simulate downstream P3 service (e.g., case creation) returning error","1. Force downstream failure (config toggle or mock).
+2. Send request.
+3. Inspect response and retry strategy.","Request fails gracefully with actionable error; no partial records left in inconsistent state; retry guidance provided.",,
+23,Facility association to physician,"Physician exists without linked facility","1. Ensure physician record present.
+2. Send payload with new facility details.
+3. Review associations post-ingest.","Facility created and linked to physician; duplicates avoided.",,
+24,Multiple physician addresses,"Business rule allows multiple addresses","1. Include two physician.addresses entries.
+2. Send request.
+3. Verify stored addresses.","All addresses persisted or business rule documented (e.g., primary only) without duplication.",,
+25,Multiple physician phone numbers,"Physician requires more than one contact number","1. Provide multiple physician.phones entries.
+2. Execute request.
+3. Check resulting phone storage/handling.","Phones persisted per design (primary + additional) or documented limitation; no validation errors unless restricted.",,
+26,Patient contact deduplication,"Patient already has phone/email stored","1. Seed patient with existing contacts.
+2. Send payload containing same contact data and new values.
+3. Review patient contacts after ingest.","Contacts merged or updated without duplication; dedupe rules obeyed; validation errors for conflicting formats handled.",,
+27,Date normalization,"System expects UTC or specific format","1. Provide dates with timezone offsets and different precision.
+2. Send request.
+3. Inspect stored date values.","Dates normalized to expected format (e.g., ISO 8601 UTC); invalid formats rejected with validation error.",,
+28,Past prescription dates,"Prescription contains historical written/dispense dates","1. Set writtenDate/lastDispenseDate far in past but valid.
+2. Send request.","Request accepted; historical data stored correctly; audit trail intact.",,
+29,Future-dated prescription checks,"Prescription has future nextAvailableRefillDate/expirationDate","1. Set future dates within allowed range.
+2. Execute request.","Request accepted or returns clear validation error if future dates disallowed; behavior documented.",,
+30,NDC to product mapping failure,"Product catalog missing provided NDC","1. Send payload with unknown NDC.
+2. Observe downstream mapping step.","Error handled gracefully (fallback product, rejection with message, or manual review flag); prescription still stored per requirements.",,
+31,Audit log creation,"Audit logging enabled","1. Execute happy-path request.
+2. Check audit/event logs.","Audit entry recorded with key identifiers (transactionId, patientId, status).",,
+32,Security logging for failures,"Security logging configured for auth/validation errors","1. Trigger unauthorized request and validation error scenarios.
+2. Inspect security logs/alerts.","Failures logged with appropriate severity and metadata; no sensitive data leakage.",,
+33,Performance baseline,"Target SLA defined (e.g., <2s) with typical payload","1. Measure response time over N iterations using happy-path request.
+2. Capture metrics.","Average/95th percentile latency meets SLA; resource utilization acceptable.",,
+34,Swagger contract alignment,"Latest OpenAPI contract available","1. Compare endpoint response/request schema with published Swagger.
+2. Validate Postman tests against schema.","No discrepancies between implementation and contract; mismatches documented for remediation.",,
+35,Case workflow automation,"Workflow orchestration configured for Idorsia","1. Trigger new prescription ingestion.
+2. Monitor workflow engine or job queue.","Workflow initiated with correct parameters (e.g., welcome call task) or manual follow-up flagged.",,
+36,Boomi integration handshake,"Boomi integration steps available in lower environment","1. Coordinate with Boomi to push webhook payload.
+2. Observe Boomi logs and endpoint reception.","Boomi successfully posts to endpoint; acknowledgements/response codes align with integration contract.",,
