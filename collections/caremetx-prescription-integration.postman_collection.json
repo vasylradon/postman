@@ -1,0 +1,1227 @@
+{
+  "info": {
+    "name": "Caremetx Prescription Integration",
+    "description": "Automation helpers for exercising POST /api/v1/caremetx/prescription-integration plus lookup calls for downstream verification.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.2.0"
+  },
+  "item": [
+    {
+      "name": "Patient Lookup by External Reference",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "ApiKey {{apiKey}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/patients/external/{{clientId}}/{{patientExternalId}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "patients",
+            "external",
+            "{{clientId}}",
+            "{{patientExternalId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const externalId = pm.variables.get('patientExternalId');",
+              "if (!externalId) {",
+              "    console.warn('patientExternalId not set; run Scenario 02 before using this lookup.');",
+              "    pm.test('Patient lookup skipped (no patientExternalId variable)', function () {",
+              "        pm.expect(true).to.be.true;",
+              "    });",
+              "    return;",
+              "}",
+              "pm.test('Patient lookup succeeded', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "const body = pm.response.text();",
+              "pm.test('Patient payload references identifiers', function () {",
+              "    pm.expect(body).to.include(externalId.toString());",
+              "    const expectedFirst = pm.variables.get('patientFirstNameCurrent');",
+              "    const expectedLast = pm.variables.get('patientLastNameCurrent');",
+              "    if (expectedFirst) {",
+              "        pm.expect(body).to.include(expectedFirst);",
+              "    }",
+              "    if (expectedLast) {",
+              "        pm.expect(body).to.include(expectedLast);",
+              "    }",
+              "});"
+            ]
+          }
+        }
+      ],
+      "description": "Use after Scenario 02/03 to confirm patient demographics persisted."
+    },
+    {
+      "name": "Physician Lookup by NPI",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "ApiKey {{apiKey}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/physicians/by-npi/{{physicianNpi}}?clientId={{clientId}}&programId={{programId}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "physicians",
+            "by-npi",
+            "{{physicianNpi}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const npi = pm.variables.get('physicianNpi');",
+              "if (!npi) {",
+              "    console.warn('physicianNpi not set; run Scenario 02 before using this lookup.');",
+              "    pm.test('Physician lookup skipped (no physicianNpi variable)', function () {",
+              "        pm.expect(true).to.be.true;",
+              "    });",
+              "    return;",
+              "}",
+              "pm.test('Physician lookup succeeded', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "const body = pm.response.text();",
+              "pm.test('Physician payload references identifiers', function () {",
+              "    pm.expect(body).to.include(npi.toString());",
+              "    const expectedFirst = pm.variables.get('physicianFirstNameCurrent');",
+              "    const expectedLast = pm.variables.get('physicianLastNameCurrent');",
+              "    if (expectedFirst) {",
+              "        pm.expect(body).to.include(expectedFirst);",
+              "    }",
+              "    if (expectedLast) {",
+              "        pm.expect(body).to.include(expectedLast);",
+              "    }",
+              "});"
+            ]
+          }
+        }
+      ],
+      "description": "Confirm physician details for the active NPI; expects Scenario 02 to have run."
+    },
+    {
+      "name": "Facility Lookup by Address",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "ApiKey {{apiKey}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/facilities/search?clientId={{clientId}}&address1={{facilityAddress1Current}}&state={{facilityState}}&zipCode={{facilityZip}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "facilities",
+            "search"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const address1 = pm.variables.get('facilityAddress1Current') || pm.variables.get('facilityAddress1');",
+              "const state = pm.variables.get('facilityState');",
+              "const zip = pm.variables.get('facilityZip');",
+              "if (!address1 || !state || !zip) {",
+              "    console.warn('Facility address variables not populated; run Scenario 02 first.');",
+              "    pm.test('Facility lookup skipped (address variables missing)', function () {",
+              "        pm.expect(true).to.be.true;",
+              "    });",
+              "    return;",
+              "}",
+              "pm.test('Facility lookup succeeded', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "const body = pm.response.text();",
+              "pm.test('Facility payload references key address elements', function () {",
+              "    pm.expect(body).to.include(address1);",
+              "    pm.expect(body).to.include(state.toString());",
+              "    pm.expect(body).to.include(zip.toString());",
+              "});",
+              "const extension = pm.variables.get('facilityAddressExtensionCurrent');",
+              "if (extension) {",
+              "    pm.test('Facility payload reflects latest address extension', function () {",
+              "        pm.expect(body).to.include(extension);",
+              "    });",
+              "}"
+            ]
+          }
+        }
+      ],
+      "description": "Validate facility deduplication or updates using the stored address criteria."
+    },
+    {
+      "name": "Prescription Lookup by Number",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "ApiKey {{apiKey}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/prescriptions/by-number/{{prescriptionNumber}}?clientId={{clientId}}&programId={{programId}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "prescriptions",
+            "by-number",
+            "{{prescriptionNumber}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const rxNumber = pm.variables.get('prescriptionNumber');",
+              "if (!rxNumber) {",
+              "    console.warn('prescriptionNumber not set; run Scenario 02 before using this lookup.');",
+              "    pm.test('Prescription lookup skipped (no prescriptionNumber variable)', function () {",
+              "        pm.expect(true).to.be.true;",
+              "    });",
+              "    return;",
+              "}",
+              "pm.test('Prescription lookup succeeded', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "const body = pm.response.text();",
+              "pm.test('Prescription payload references identifiers', function () {",
+              "    pm.expect(body).to.include(rxNumber);",
+              "    const ndc = pm.variables.get('prescriptionNdc');",
+              "    if (ndc) {",
+              "        pm.expect(body).to.include(ndc);",
+              "    }",
+              "});"
+            ]
+          }
+        }
+      ],
+      "description": "Confirm prescription creation and updates using the last submitted prescription number."
+    },
+    {
+      "name": "Case Lookup by Identifier",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "ApiKey {{apiKey}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/cases/{{lastCaseId}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "cases",
+            "{{lastCaseId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const caseId = pm.variables.get('lastCaseId');",
+              "if (!caseId) {",
+              "    console.warn('lastCaseId not set; run Scenario 02 before using this lookup.');",
+              "    pm.test('Case lookup skipped (no lastCaseId variable)', function () {",
+              "        pm.expect(true).to.be.true;",
+              "    });",
+              "    return;",
+              "}",
+              "pm.test('Case lookup succeeded', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "});",
+              "const body = pm.response.text();",
+              "pm.test('Case payload references last case id', function () {",
+              "    pm.expect(body).to.include(caseId.toString());",
+              "});"
+            ]
+          }
+        }
+      ],
+      "description": "Verify case creation and linkage for the most recent successful ingestion."
+    },
+    {
+      "name": "Prescription Intake",
+      "description": "Scenario-specific POST requests for /api/v1/caremetx/prescription-integration covering happy path, validation, and data maintenance behaviors.",
+      "item": [
+        {
+          "name": "01 Unauthorized - Invalid API Key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "ApiKey {{apiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "caremetx",
+                "prescription-integration"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": {\n    \"prescriptionNumber\": \"RX-UNAUTH\",\n    \"ndc\": \"11111111111\",\n    \"quantity\": 1\n  },\n  \"patient\": {\n    \"patientId\": 1001,\n    \"firstName\": \"Test\",\n    \"lastName\": \"User\",\n    \"dateOfBirth\": \"1980-01-01T00:00:00Z\",\n    \"phones\": [\n      {\n        \"number\": \"5025550100\",\n        \"type\": 0\n      }\n    ]\n  },\n  \"physician\": {\n    \"npiNumber\": \"1234567890\",\n    \"firstName\": \"Auth\",\n    \"lastName\": \"Check\"\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.request.headers.upsert({ key: 'Authorization', value: 'ApiKey ' + (pm.variables.get('invalidApiKey') || 'INVALID') });"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Unauthorized response returns 401', function () {",
+                  "    pm.expect(pm.response.code).to.eql(401);",
+                  "});",
+                  "if (pm.response.headers.has('Content-Type') && pm.response.headers.get('Content-Type').includes('json')) {",
+                  "    const json = pm.response.json();",
+                  "    pm.test('Unauthorized payload follows RFC 7807 format', function () {",
+                  "        pm.expect(json).to.include.keys('type', 'title', 'status');",
+                  "        pm.expect(json.status).to.eql(401);",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "description": "Negative coverage: invalid API key should yield 401 with RFC 7807 payload."
+        },
+        {
+          "name": "02 New Prescription Ingestion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "ApiKey {{apiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "caremetx",
+                "prescription-integration"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": {\n    \"prescriptionNumber\": \"{{prescriptionNumber}}\",\n    \"ndc\": \"{{prescriptionNdc}}\",\n    \"quantity\": 30,\n    \"dosage\": \"500 mg\",\n    \"refillsNumber\": 2,\n    \"fillsMade\": 0,\n    \"refillsRemaining\": 2,\n    \"dispenseAsWritten\": true,\n    \"physicianSignature\": true,\n    \"physicianSignatureDate\": \"2025-01-15T00:00:00Z\",\n    \"expirationDate\": \"2026-01-15T00:00:00Z\",\n    \"daysSupply\": 30,\n    \"lastDispenseDate\": \"2024-12-20T00:00:00Z\",\n    \"nextAvailableRefillDate\": \"2025-01-20T00:00:00Z\",\n    \"source\": \"Electronic\"\n  },\n  \"patient\": {\n    \"patientId\": {{patientExternalId}},\n    \"firstName\": \"{{patientFirstNameCurrent}}\",\n    \"lastName\": \"{{patientLastNameCurrent}}\",\n    \"dateOfBirth\": \"1982-05-04T00:00:00Z\",\n    \"gender\": 1,\n    \"languageId\": -1,\n    \"email\": \"{{patientEmail}}\",\n    \"addresses\": [\n      {\n        \"type\": 0,\n        \"streetAddress\": \"{{facilityAddress1}}\",\n        \"city\": \"{{facilityCity}}\",\n        \"state\": {{facilityState}},\n        \"zipCode\": \"{{facilityZip}}\",\n        \"addressExtension\": \"{{facilityAddressExtensionCurrent}}\"\n      }\n    ],\n    \"phones\": [\n      {\n        \"number\": \"{{patientPhonePrimary}}\",\n        \"type\": 0,\n        \"extension\": \"\"\n      }\n    ]\n  },\n  \"physician\": {\n    \"npiNumber\": \"{{physicianNpi}}\",\n    \"firstName\": \"{{physicianFirstNameCurrent}}\",\n    \"lastName\": \"{{physicianLastNameCurrent}}\",\n    \"specialtyCode\": \"ENT\",\n    \"specialtyName\": \"Ear Nose Throat\",\n    \"addresses\": [\n      {\n        \"name\": \"Primary Office\",\n        \"streetAddress\": \"{{facilityAddress1}}\",\n        \"city\": \"{{facilityCity}}\",\n        \"state\": {{facilityState}},\n        \"zipCode\": \"{{facilityZip}}\",\n        \"addressExtension\": \"{{facilityAddressExtensionCurrent}}\"\n      }\n    ],\n    \"phones\": [\n      {\n        \"number\": \"7331933{{multiAddressToken}}\",\n        \"type\": 1,\n        \"extension\": \"\"\n      }\n    ]\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const seed = Date.now();",
+                  "const short = seed.toString().slice(-5);",
+                  "const patientId = Math.floor(Math.random() * 900000) + 100000;",
+                  "const patientFirst = `Auto${short}`;",
+                  "const patientLast = `Person${short}`;",
+                  "const patientPhone = (Math.floor(Math.random() * 9000000000) + 1000000000).toString();",
+                  "const physicianNpi = (Math.floor(Math.random() * 9000000000) + 1000000000).toString();",
+                  "const physicianFirst = `Phys${short}`;",
+                  "const physicianLast = `Owner${short}`;",
+                  "const facilityAddress1 = `${Math.floor(Math.random() * 900) + 100} Integration Way`;",
+                  "const facilityCity = 'Louisville';",
+                  "const facilityState = 21;",
+                  "const facilityZip = (Math.floor(Math.random() * 90000) + 10000).toString();",
+                  "const facilityExtension = `Suite ${short}`;",
+                  "const prescriptionNumber = `RX-${seed}`;",
+                  "const ndc = (Math.floor(Math.random() * 90000000000) + 10000000000).toString();",
+                  "pm.collectionVariables.set('patientExternalId', patientId);",
+                  "pm.collectionVariables.set('patientFirstNameOriginal', patientFirst);",
+                  "pm.collectionVariables.set('patientLastNameOriginal', patientLast);",
+                  "pm.collectionVariables.set('patientFirstNameCurrent', patientFirst);",
+                  "pm.collectionVariables.set('patientLastNameCurrent', patientLast);",
+                  "pm.collectionVariables.set('patientPhonePrimary', patientPhone);",
+                  "pm.collectionVariables.set('patientEmail', `caremetx-qa+${short}@example.com`);",
+                  "pm.collectionVariables.set('physicianNpi', physicianNpi);",
+                  "pm.collectionVariables.set('physicianFirstNameOriginal', physicianFirst);",
+                  "pm.collectionVariables.set('physicianLastNameOriginal', physicianLast);",
+                  "pm.collectionVariables.set('physicianFirstNameCurrent', physicianFirst);",
+                  "pm.collectionVariables.set('physicianLastNameCurrent', physicianLast);",
+                  "pm.collectionVariables.set('facilityAddress1', facilityAddress1);",
+                  "pm.collectionVariables.set('facilityAddress1Current', facilityAddress1);",
+                  "pm.collectionVariables.set('facilityCity', facilityCity);",
+                  "pm.collectionVariables.set('facilityState', facilityState);",
+                  "pm.collectionVariables.set('facilityZip', facilityZip);",
+                  "pm.collectionVariables.set('facilityAddressExtensionOriginal', facilityExtension);",
+                  "pm.collectionVariables.set('facilityAddressExtensionCurrent', facilityExtension);",
+                  "pm.collectionVariables.set('prescriptionNumber', prescriptionNumber);",
+                  "pm.collectionVariables.set('prescriptionNdc', ndc);",
+                  "pm.collectionVariables.set('openCasePrescriptionNumber', `RX-CASE-${seed}`);",
+                  "pm.collectionVariables.set('multiAddressToken', short);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status indicates creation success', function () {",
+                  "    pm.expect([200, 201]).to.include(pm.response.code);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "const successSchema = {",
+                  "  type: 'object',",
+                  "  required: ['value', 'code', 'success', 'message'],",
+                  "  properties: {",
+                  "    value: {",
+                  "      type: 'object',",
+                  "      required: ['prescriptionId', 'caseId', 'success', 'message'],",
+                  "      properties: {",
+                  "        prescriptionId: { type: ['string', 'number'] },",
+                  "        caseId: { type: ['string', 'number'] },",
+                  "        success: { type: 'boolean' },",
+                  "        message: { type: 'string' }",
+                  "      }",
+                  "    },",
+                  "    code: { type: 'number' },",
+                  "    success: { type: 'boolean' },",
+                  "    message: { type: 'string' }",
+                  "  }",
+                  "};",
+                  "pm.test('Success response matches contract schema', function () {",
+                  "    pm.expect(tv4.validate(json, successSchema), JSON.stringify(tv4.error)).to.be.true;",
+                  "});",
+                  "pm.test('Envelope indicates success', function () {",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.code).to.be.oneOf([200, 201, 204]);",
+                  "});",
+                  "pm.collectionVariables.set('lastCaseId', json.value.caseId);",
+                  "pm.collectionVariables.set('lastPrescriptionId', json.value.prescriptionId);",
+                  "pm.collectionVariables.set('latestSuccessMessage', json.value.message);",
+                  "pm.test('Identifiers captured for downstream verification', function () {",
+                  "    pm.expect(pm.collectionVariables.get('lastCaseId')).to.exist;",
+                  "    pm.expect(pm.collectionVariables.get('lastPrescriptionId')).to.exist;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "description": "Happy path creation covering patient/physician/facility/case/prescription creation with randomized identifiers."
+        },
+        {
+          "name": "03 Patient Update for Existing Prescription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "ApiKey {{apiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "caremetx",
+                "prescription-integration"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": {\n    \"prescriptionNumber\": \"{{prescriptionNumber}}\",\n    \"ndc\": \"{{prescriptionNdc}}\",\n    \"quantity\": 30\n  },\n  \"patient\": {\n    \"patientId\": {{patientExternalId}},\n    \"firstName\": \"{{patientFirstNameCurrent}}\",\n    \"lastName\": \"{{patientLastNameCurrent}}\",\n    \"dateOfBirth\": \"1982-05-04T00:00:00Z\",\n    \"gender\": 1,\n    \"email\": \"{{patientEmail}}\",\n    \"phones\": [\n      {\n        \"number\": \"{{patientPhonePrimary}}\",\n        \"type\": 0\n      }\n    ]\n  },\n  \"physician\": {\n    \"npiNumber\": \"{{physicianNpi}}\",\n    \"firstName\": \"{{physicianFirstNameCurrent}}\",\n    \"lastName\": \"{{physicianLastNameCurrent}}\"\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const suffix = '-' + (Math.floor(Math.random() * 900) + 100);",
+                  "const updatedFirst = pm.collectionVariables.get('patientFirstNameOriginal') + suffix;",
+                  "const updatedLast = pm.collectionVariables.get('patientLastNameOriginal') + suffix;",
+                  "pm.collectionVariables.set('patientFirstNameCurrent', updatedFirst);",
+                  "pm.collectionVariables.set('patientLastNameCurrent', updatedLast);",
+                  "pm.collectionVariables.set('patientEmail', `caremetx-qa+update${suffix.replace('-', '')}@example.com`);",
+                  "pm.collectionVariables.set('patientPhonePrimary', (Math.floor(Math.random() * 9000000000) + 1000000000).toString());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Existing patient update succeeds', function () {",
+                  "    pm.expect([200, 204]).to.include(pm.response.code);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test('Update response indicates success', function () {",
+                  "    pm.expect(json).to.include.keys('value', 'code', 'success', 'message');",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.value).to.be.an('object');",
+                  "});",
+                  "pm.test('Update response message reflects existing prescription handling', function () {",
+                  "    pm.expect(json.value.message.toLowerCase()).to.include.oneOf(['updated', 'already exists']);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "description": "Re-sends existing prescription while modifying patient demographics to confirm update behavior without duplication."
+        },
+        {
+          "name": "04 Physician Update Should Be Ignored",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "ApiKey {{apiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "caremetx",
+                "prescription-integration"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": {\n    \"prescriptionNumber\": \"{{prescriptionNumber}}\",\n    \"ndc\": \"{{prescriptionNdc}}\",\n    \"quantity\": 30\n  },\n  \"patient\": {\n    \"patientId\": {{patientExternalId}},\n    \"firstName\": \"{{patientFirstNameCurrent}}\",\n    \"lastName\": \"{{patientLastNameCurrent}}\"\n  },\n  \"physician\": {\n    \"npiNumber\": \"{{physicianNpi}}\",\n    \"firstName\": \"{{physicianFirstNameAttempt}}\",\n    \"lastName\": \"{{physicianLastNameAttempt}}\"\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const suffix = '-' + (Math.floor(Math.random() * 90) + 10);",
+                  "pm.variables.set('physicianFirstNameAttempt', pm.collectionVariables.get('physicianFirstNameOriginal') + suffix);",
+                  "pm.variables.set('physicianLastNameAttempt', pm.collectionVariables.get('physicianLastNameOriginal') + suffix);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Physician update attempt succeeds', function () {",
+                  "    pm.expect([200, 204]).to.include(pm.response.code);",
+                  "});",
+                  "const updateResponse = pm.response.json();",
+                  "pm.test('Physician update attempt response indicates no duplication', function () {",
+                  "    pm.expect(updateResponse).to.have.property('value');",
+                  "    const message = ((updateResponse.value && updateResponse.value.message) || '').toString().toLowerCase();",
+                  "    pm.expect(['already exists', 'unchanged', 'updated'].some(function (keyword) { return message.includes(keyword); })).to.be.true;",
+                  "});",
+                  "const baseUrl = pm.variables.replaceIn('{{base_url}}');",
+                  "if (!baseUrl || baseUrl.includes('{{')) {",
+                  "    console.warn('base_url variable is not resolved; skipping physician verification lookup.');",
+                  "    return;",
+                  "}",
+                  "const npi = pm.collectionVariables.get('physicianNpi') || pm.collectionVariables.get('physicianNpiExisting') || '1234567464';",
+                  "const authHeader = pm.variables.replaceIn('ApiKey {{apiKey}}');",
+                  "if (!authHeader || authHeader.includes('{{')) {",
+                  "    console.warn('apiKey variable is not resolved; skipping physician verification lookup.');",
+                  "    return;",
+                  "}",
+                  "pm.sendRequest({",
+                  "    url: `${baseUrl}/api/v1/Physicians/getByNPI?npi=${encodeURIComponent(npi)}`,",
+                  "    method: 'GET',",
+                  "    header: { Authorization: authHeader }",
+                  "}, function (err, res) {",
+                  "    pm.test('Physician lookup after update attempt succeeds', function () {",
+                  "        pm.expect(err).to.eql(null);",
+                  "        pm.expect(res).to.be.an('object');",
+                  "        pm.expect(res.code).to.eql(200);",
+                  "    });",
+                  "    if (err || !res) {",
+                  "        return;",
+                  "    }",
+                  "    const lookup = res.json();",
+                  "    const value = lookup && lookup.value ? lookup.value : {};",
+                  "    pm.collectionVariables.set('physicianFirstNameCurrent', value.firstName || pm.collectionVariables.get('physicianFirstNameCurrent') || '');",
+                  "    pm.collectionVariables.set('physicianLastNameCurrent', value.lastName || pm.collectionVariables.get('physicianLastNameCurrent') || '');",
+                  "    pm.test('Physician names remain unchanged after update attempt', function () {",
+                  "        pm.expect(value.firstName).to.eql(pm.collectionVariables.get('physicianFirstNameOriginal'));",
+                  "        pm.expect(value.lastName).to.eql(pm.collectionVariables.get('physicianLastNameOriginal'));",
+                  "    });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "description": "Attempts to modify physician demographics while sharing the same NPI; changes should be ignored while preventing duplicates."
+        },
+        {
+          "name": "05 Existing Facility Secondary Field Update",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "ApiKey {{apiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "caremetx",
+                "prescription-integration"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": {\n    \"prescriptionNumber\": \"{{prescriptionNumber}}\",\n    \"ndc\": \"{{prescriptionNdc}}\",\n    \"quantity\": 30\n  },\n  \"patient\": {\n    \"patientId\": {{patientExternalId}},\n    \"firstName\": \"{{patientFirstNameCurrent}}\",\n    \"lastName\": \"{{patientLastNameCurrent}}\"\n  },\n  \"physician\": {\n    \"npiNumber\": \"{{physicianNpi}}\",\n    \"firstName\": \"{{physicianFirstNameCurrent}}\",\n    \"lastName\": \"{{physicianLastNameCurrent}}\",\n    \"addresses\": [\n      {\n        \"name\": \"Primary Office\",\n        \"streetAddress\": \"{{facilityAddress1}}\",\n        \"city\": \"{{facilityCity}}\",\n        \"state\": {{facilityState}},\n        \"zipCode\": \"{{facilityZip}}\",\n        \"addressExtension\": \"{{facilityExtensionAttempt}}\"\n      }\n    ]\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const extension = `Suite ${Math.floor(Math.random() * 900) + 100}`;",
+                  "pm.variables.set('facilityExtensionAttempt', extension);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Facility update returns success', function () {",
+                  "    pm.expect([200, 204]).to.include(pm.response.code);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test('Facility update response indicates success', function () {",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "});",
+                  "pm.collectionVariables.set('facilityAddressExtensionCurrent', pm.variables.get('facilityExtensionAttempt'));"
+                ]
+              }
+            }
+          ],
+          "description": "Confirms matching facility keys update secondary fields (extension) without duplication."
+        },
+        {
+          "name": "06 New Prescription With Existing Open Case",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "ApiKey {{apiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "caremetx",
+                "prescription-integration"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": {\n    \"prescriptionNumber\": \"{{openCasePrescriptionNumber}}\",\n    \"ndc\": \"{{prescriptionNdc}}\",\n    \"quantity\": 30\n  },\n  \"patient\": {\n    \"patientId\": {{patientExternalId}},\n    \"firstName\": \"{{patientFirstNameCurrent}}\",\n    \"lastName\": \"{{patientLastNameCurrent}}\"\n  },\n  \"physician\": {\n    \"npiNumber\": \"{{physicianNpi}}\",\n    \"firstName\": \"{{physicianFirstNameCurrent}}\",\n    \"lastName\": \"{{physicianLastNameCurrent}}\"\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Open case conflict returns 400', function () {",
+                  "    pm.expect(pm.response.code).to.eql(400);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test('Open case error structure matches expected contract', function () {",
+                  "    pm.expect(json).to.include.keys('errors', 'code', 'success', 'message');",
+                  "    pm.expect(json.code).to.eql(400);",
+                  "    pm.expect(json.success).to.eql(false);",
+                  "    pm.expect(json.errors).to.have.property('message');",
+                  "    pm.expect(json.errors.message).to.be.an('array').that.is.not.empty;",
+                  "});",
+                  "pm.test('Open case error explains existing open case restriction', function () {",
+                  "    const messageText = Array.isArray(json.errors.message) ? json.errors.message.join(' ') : String(json.errors.message || '');",
+                  "    pm.expect(messageText.toLowerCase()).to.include('already has an open case');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "description": "Attempts to create a second prescription for an active case; should return a graceful 400 error."
+        },
+        {
+          "name": "07 Duplicate Prescription Handling",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "ApiKey {{apiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "caremetx",
+                "prescription-integration"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": {\n    \"prescriptionNumber\": \"{{prescriptionNumber}}\",\n    \"ndc\": \"{{prescriptionNdc}}\",\n    \"quantity\": 30\n  },\n  \"patient\": {\n    \"patientId\": {{patientExternalId}},\n    \"firstName\": \"{{patientFirstNameCurrent}}\",\n    \"lastName\": \"{{patientLastNameCurrent}}\"\n  },\n  \"physician\": {\n    \"npiNumber\": \"{{physicianNpi}}\",\n    \"firstName\": \"{{physicianFirstNameCurrent}}\",\n    \"lastName\": \"{{physicianLastNameCurrent}}\"\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Duplicate submission succeeds', function () {",
+                  "    pm.expect([200, 204]).to.include(pm.response.code);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test('Duplicate response indicates existing prescription reuse', function () {",
+                  "    pm.expect(json.value.message.toLowerCase()).to.include('already exists');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "description": "Replays the last successful payload to confirm idempotent duplicate handling."
+        },
+        {
+          "name": "08 Missing Required Fields",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "ApiKey {{apiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "caremetx",
+                "prescription-integration"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": {\n    \"prescriptionNumber\": \"{{prescriptionNumber}}\",\n    \"ndc\": \"{{prescriptionNdc}}\",\n    \"quantity\": 30\n  },\n  \"patient\": {\n    \"patientId\": {{patientExternalId}},\n    \"firstName\": \"{{patientFirstNameCurrent}}\"\n  },\n  \"physician\": {\n    \"npiNumber\": \"{{physicianNpi}}\",\n    \"firstName\": \"{{physicianFirstNameCurrent}}\",\n    \"lastName\": \"{{physicianLastNameCurrent}}\"\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Missing required fields return 400', function () {",
+                  "    pm.expect(pm.response.code).to.eql(400);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "const errorSchema = {",
+                  "  type: 'object',",
+                  "  required: ['type', 'title', 'status', 'traceId', 'errors'],",
+                  "  properties: {",
+                  "    type: { type: 'string' },",
+                  "    title: { type: 'string' },",
+                  "    status: { type: 'number' },",
+                  "    traceId: { type: 'string' },",
+                  "    errors: { type: 'object' }",
+                  "  }",
+                  "};",
+                  "pm.test('Validation error matches RFC 7807 schema', function () {",
+                  "    pm.expect(tv4.validate(json, errorSchema), JSON.stringify(tv4.error)).to.be.true;",
+                  "});",
+                  "pm.test('Error payload highlights missing patient last name', function () {",
+                  "    pm.expect(json.errors['Patient.LastName'][0].toLowerCase()).to.include('required');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "description": "Negative coverage: omit required patient last name to assert RFC 7807 validation response."
+        },
+        {
+          "name": "09 Required Fields Only",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "ApiKey {{apiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "caremetx",
+                "prescription-integration"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": {\n    \"prescriptionNumber\": \"{{minimalPrescriptionNumber}}\",\n    \"ndc\": \"{{minimalPrescriptionNdc}}\",\n    \"quantity\": 1\n  },\n  \"patient\": {\n    \"patientId\": {{minimalPatientId}},\n    \"firstName\": \"{{minimalPatientFirstName}}\",\n    \"lastName\": \"{{minimalPatientLastName}}\",\n    \"dateOfBirth\": \"1982-05-04T00:00:00Z\",\n    \"phones\": [\n      {\n        \"number\": \"{{minimalPatientPhone}}\",\n        \"type\": 0\n      }\n    ]\n  },\n  \"physician\": {\n    \"npiNumber\": \"{{minimalPhysicianNpi}}\",\n    \"firstName\": \"{{minimalPhysicianFirstName}}\",\n    \"lastName\": \"{{minimalPhysicianLastName}}\"\n  }\n}\n"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const stamp = Date.now().toString();",
+                  "pm.variables.set('minimalPrescriptionNumber', `RX-MIN-${stamp}`);",
+                  "pm.variables.set('minimalPrescriptionNdc', (Math.floor(Math.random() * 90000000000) + 10000000000).toString());",
+                  "pm.variables.set('minimalPatientId', Math.floor(Math.random() * 900000) + 100000);",
+                  "pm.variables.set('minimalPatientFirstName', `Min${stamp.slice(-4)}`);",
+                  "pm.variables.set('minimalPatientLastName', `Req${stamp.slice(-4)}`);",
+                  "pm.variables.set('minimalPatientPhone', (Math.floor(Math.random() * 9000000000) + 1000000000).toString());",
+                  "pm.variables.set('minimalPhysicianNpi', (Math.floor(Math.random() * 9000000000) + 1000000000).toString());",
+                  "pm.variables.set('minimalPhysicianFirstName', `MiniPhys${stamp.slice(-3)}`);",
+                  "pm.variables.set('minimalPhysicianLastName', `Check${stamp.slice(-3)}`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Minimal payload succeeds', function () {",
+                  "    pm.expect([200, 204]).to.include(pm.response.code);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test('Minimal payload response indicates success', function () {",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "description": "Ensures optional sections can be omitted while meeting required field set."
+        },
+        {
+          "name": "10 Facility Association to Physician",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "ApiKey {{apiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "caremetx",
+                "prescription-integration"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": {\n    \"prescriptionNumber\": \"{{prescriptionNumber}}\",\n    \"ndc\": \"{{prescriptionNdc}}\",\n    \"quantity\": 15\n  },\n  \"patient\": {\n    \"patientId\": {{patientExternalId}},\n    \"firstName\": \"{{patientFirstNameCurrent}}\",\n    \"lastName\": \"{{patientLastNameCurrent}}\"\n  },\n  \"physician\": {\n    \"npiNumber\": \"{{physicianNpi}}\",\n    \"firstName\": \"{{physicianFirstNameCurrent}}\",\n    \"lastName\": \"{{physicianLastNameCurrent}}\",\n    \"addresses\": [\n      {\n        \"name\": \"Association Office\",\n        \"streetAddress\": \"{{associationFacilityAddress1}}\",\n        \"city\": \"{{facilityCity}}\",\n        \"state\": {{facilityState}},\n        \"zipCode\": \"{{facilityZip}}\",\n        \"addressExtension\": \"{{associationFacilityExtension}}\"\n      }\n    ]\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const seed = Date.now();",
+                  "const facilityAddress1 = `${Math.floor(Math.random() * 900) + 100} Assoc Ave`;",
+                  "const facilityExtension = `Floor ${Math.floor(Math.random() * 9) + 1}`;",
+                  "pm.variables.set('associationFacilityAddress1', facilityAddress1);",
+                  "pm.variables.set('associationFacilityExtension', facilityExtension);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Facility association call succeeds', function () {",
+                  "    pm.expect([200, 204]).to.include(pm.response.code);",
+                  "});",
+                  "pm.collectionVariables.set('facilityAddress1Current', pm.variables.get('associationFacilityAddress1'));",
+                  "pm.collectionVariables.set('facilityAddressExtensionCurrent', pm.variables.get('associationFacilityExtension'));"
+                ]
+              }
+            }
+          ],
+          "description": "Adds a new facility address for the existing physician to confirm association linkage."
+        },
+        {
+          "name": "11 Multiple Physician Addresses",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "ApiKey {{apiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "caremetx",
+                "prescription-integration"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": {\n    \"prescriptionNumber\": \"{{prescriptionNumber}}\",\n    \"ndc\": \"{{prescriptionNdc}}\",\n    \"quantity\": 10\n  },\n  \"patient\": {\n    \"patientId\": {{patientExternalId}},\n    \"firstName\": \"{{patientFirstNameCurrent}}\",\n    \"lastName\": \"{{patientLastNameCurrent}}\"\n  },\n  \"physician\": {\n    \"npiNumber\": \"{{physicianNpi}}\",\n    \"firstName\": \"{{physicianFirstNameCurrent}}\",\n    \"lastName\": \"{{physicianLastNameCurrent}}\",\n    \"addresses\": [\n      {\n        \"name\": \"Primary Office\",\n        \"streetAddress\": \"{{facilityAddress1Current}}\",\n        \"city\": \"{{facilityCity}}\",\n        \"state\": {{facilityState}},\n        \"zipCode\": \"{{facilityZip}}\",\n        \"addressExtension\": \"{{facilityAddressExtensionCurrent}}\"\n      },\n      {\n        \"name\": \"Satellite\",\n        \"streetAddress\": \"{{multiAddressTwo}}\",\n        \"city\": \"{{facilityCity}}\",\n        \"state\": {{facilityState}},\n        \"zipCode\": \"{{facilityZip}}\",\n        \"addressExtension\": \"{{multiExtensionTwo}}\"\n      }\n    ]\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const token = pm.collectionVariables.get('multiAddressToken') || Date.now().toString().slice(-5);",
+                  "pm.variables.set('multiAddressOne', `${Math.floor(Math.random() * 900) + 100} Multi Blvd`);",
+                  "pm.variables.set('multiAddressTwo', `${Math.floor(Math.random() * 900) + 100} Multi Ct`);",
+                  "pm.variables.set('multiExtensionOne', `Suite ${token}`);",
+                  "pm.variables.set('multiExtensionTwo', `Floor ${token}`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Multiple address submission succeeds', function () {",
+                  "    pm.expect([200, 204]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "description": "Submits multiple physician addresses to confirm facilities are created or maintained without duplication."
+        },
+        {
+          "name": "12 Success Response Schema Validation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "ApiKey {{apiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "caremetx",
+                "prescription-integration"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": {\n    \"prescriptionNumber\": \"{{prescriptionNumber}}-SCHEMA\",\n    \"ndc\": \"{{prescriptionNdc}}\",\n    \"quantity\": 30\n  },\n  \"patient\": {\n    \"patientId\": {{patientExternalId}},\n    \"firstName\": \"{{patientFirstNameCurrent}}\",\n    \"lastName\": \"{{patientLastNameCurrent}}\"\n  },\n  \"physician\": {\n    \"npiNumber\": \"{{physicianNpi}}\",\n    \"firstName\": \"{{physicianFirstNameCurrent}}\",\n    \"lastName\": \"{{physicianLastNameCurrent}}\"\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code indicates success', function () {",
+                  "    pm.expect([200, 201, 204]).to.include(pm.response.code);",
+                  "});",
+                  "if (pm.response.code !== 204) {",
+                  "    const json = pm.response.json();",
+                  "    const successSchema = {",
+                  "      type: 'object',",
+                  "      required: ['value', 'code', 'success', 'message'],",
+                  "      properties: {",
+                  "        value: {",
+                  "          type: 'object',",
+                  "          required: ['prescriptionId', 'caseId', 'success', 'message'],",
+                  "        },",
+                  "        code: { type: 'number' },",
+                  "        success: { type: 'boolean' },",
+                  "        message: { type: 'string' }",
+                  "      }",
+                  "    };",
+                  "    pm.test('Success payload validates against schema', function () {",
+                  "        pm.expect(tv4.validate(json, successSchema), JSON.stringify(tv4.error)).to.be.true;",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "description": "Focused schema validation for successful envelopes using the active dataset."
+        },
+        {
+          "name": "13 Error Response Schema Validation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "ApiKey {{apiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "caremetx",
+                "prescription-integration"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": { },\n  \"patient\": { },\n  \"physician\": { }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Validation error returns 400', function () {",
+                  "    pm.expect(pm.response.code).to.eql(400);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "const errorSchema = {",
+                  "  type: 'object',",
+                  "  required: ['type', 'title', 'status', 'traceId', 'errors'],",
+                  "  properties: {",
+                  "    type: { type: 'string' },",
+                  "    title: { type: 'string' },",
+                  "    status: { type: 'number' },",
+                  "    traceId: { type: 'string' },",
+                  "    errors: { type: 'object' }",
+                  "  }",
+                  "};",
+                  "pm.test('Error payload validates against schema', function () {",
+                  "    pm.expect(tv4.validate(json, errorSchema), JSON.stringify(tv4.error)).to.be.true;",
+                  "});",
+                  "pm.test('Error payload lists missing top-level sections', function () {",
+                  "    pm.expect(Object.keys(json.errors)).to.include.members(['Patient.LastName', 'Patient.FirstName', 'Physician.LastName', 'Physician.FirstName', 'Physician.NPINumber', 'Prescription.NDC', 'Prescription.Quantity', 'Prescription.PrescriptionNumber']);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "description": "Covers comprehensive error schema validation using an intentionally empty payload."
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://example.p3.api"
+    },
+    {
+      "key": "apiKey",
+      "value": "{{PLACEHOLDER_VALID_API_KEY}}"
+    },
+    {
+      "key": "invalidApiKey",
+      "value": "INVALID-KEY"
+    },
+    {
+      "key": "clientId",
+      "value": "1"
+    },
+    {
+      "key": "programId",
+      "value": "1"
+    }
+  ]
+}
