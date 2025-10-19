@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "7628f95a-a669-4c19-b01e-12df7438220b",
-		"name": "Caremetx Prescription Integration Copy",
+		"_postman_id": "499f9b23-9dab-4b55-9e32-dd5cf38f035f",
+		"name": "Caremetx Prescription Integration",
 		"description": "Automation helpers for exercising POST /api/v1/caremetx/prescription-integration plus lookup calls for downstream verification.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "19115467"
@@ -78,7 +78,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"type": "text/javascript",
 								"exec": [
 									"const seed = Date.now();",
 									"const short = seed.toString().slice(-5);",
@@ -119,13 +118,15 @@
 									"pm.collectionVariables.set('prescriptionNdc', ndc);",
 									"pm.collectionVariables.set('openCasePrescriptionNumber', `RX-CASE-${seed}`);",
 									"pm.collectionVariables.set('multiAddressToken', short);"
-								]
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						},
 						{
 							"listen": "test",
 							"script": {
-								"type": "text/javascript",
 								"exec": [
 									"pm.test('Status indicates creation success', function () {",
 									"    pm.expect([200, 201]).to.include(pm.response.code);",
@@ -164,7 +165,10 @@
 									"    pm.expect(pm.collectionVariables.get('lastCaseId')).to.exist;",
 									"    pm.expect(pm.collectionVariables.get('lastPrescriptionId')).to.exist;",
 									"});"
-								]
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -182,7 +186,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": {\n    \"prescriptionNumber\": \"{{prescriptionNumber}}\",\n    \"ndc\": \"{{prescriptionNdc}}\",\n    \"quantity\": 30,\n    \"dosage\": \"500 mg\",\n    \"refillsNumber\": 2,\n    \"fillsMade\": 0,\n    \"refillsRemaining\": 2,\n    \"dispenseAsWritten\": true,\n    \"physicianSignature\": true,\n    \"physicianSignatureDate\": \"2025-01-15T00:00:00Z\",\n    \"expirationDate\": \"2026-01-15T00:00:00Z\",\n    \"daysSupply\": 30,\n    \"lastDispenseDate\": \"2024-12-20T00:00:00Z\",\n    \"nextAvailableRefillDate\": \"2025-01-20T00:00:00Z\",\n    \"source\": \"Electronic\"\n  },\n  \"patient\": {\n    \"patientId\": {{patientExternalId}},\n    \"firstName\": \"{{patientFirstNameCurrent}}\",\n    \"lastName\": \"{{patientLastNameCurrent}}\",\n    \"dateOfBirth\": \"1982-05-04T00:00:00Z\",\n    \"gender\": 1,\n    \"languageId\": -1,\n    \"email\": \"{{patientEmail}}\",\n    \"addresses\": [\n      {\n        \"type\": 0,\n        \"streetAddress\": \"{{facilityAddress1}}\",\n        \"city\": \"{{facilityCity}}\",\n        \"state\": {{facilityState}},\n        \"zipCode\": \"{{facilityZip}}\",\n        \"addressExtension\": \"{{facilityAddressExtensionCurrent}}\"\n      }\n    ],\n    \"phones\": [\n      {\n        \"number\": \"{{patientPhonePrimary}}\",\n        \"type\": 0,\n        \"extension\": \"\"\n      }\n    ]\n  },\n  \"physician\": {\n    \"npiNumber\": \"{{physicianNpi}}\",\n    \"firstName\": \"{{physicianFirstNameCurrent}}\",\n    \"lastName\": \"{{physicianLastNameCurrent}}\",\n    \"specialtyCode\": \"ENT\",\n    \"specialtyName\": \"Ear Nose Throat\",\n    \"addresses\": [\n      {\n        \"name\": \"Primary Office\",\n        \"streetAddress\": \"{{facilityAddress1}}\",\n        \"city\": \"{{facilityCity}}\",\n        \"state\": {{facilityState}},\n        \"zipCode\": \"{{facilityZip}}\",\n        \"addressExtension\": \"{{facilityAddressExtensionCurrent}}\"\n      }\n    ],\n    \"phones\": [\n      {\n        \"number\": \"7331933{{multiAddressToken}}\",\n        \"type\": 1,\n        \"extension\": \"\"\n      }\n    ]\n  }\n}"
+							"raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": {\n    \"prescriptionNumber\": \"{{prescriptionNumber}}\",\n    \"ndc\": \"{{prescriptionNdc}}\",\n    \"quantity\": 30,\n    \"dosage\": \"500 mg\",\n    \"refillsNumber\": 2,\n    \"fillsMade\": 0,\n    \"refillsRemaining\": 2,\n    \"dispenseAsWritten\": true,\n    \"physicianSignature\": true,\n    \"physicianSignatureDate\": \"2025-01-15T00:00:00Z\",\n    \"expirationDate\": \"2026-01-15T00:00:00Z\",\n    \"daysSupply\": 30,\n    \"lastDispenseDate\": \"2024-12-20T00:00:00Z\",\n    \"nextAvailableRefillDate\": \"2025-01-20T00:00:00Z\",\n    \"source\": \"Electronic\"\n  },\n  \"patient\": {\n    \"patientId\": {{patientExternalId}},\n    \"firstName\": \"{{patientFirstNameCurrent}}\",\n    \"lastName\": \"{{patientLastNameCurrent}}\",\n    \"dateOfBirth\": \"1982-05-04T00:00:00Z\",\n    \"gender\": 1,\n    \"languageId\": -1,\n    \"email\": \"{{patientEmail}}\",\n    \"addresses\": [\n      {\n        \"type\": 0,\n        \"streetAddress\": \"{{facilityAddress1}}\",\n        \"city\": \"{{facilityCity}}\",\n        \"state\": {{facilityState}},\n        \"zipCode\": \"{{facilityZip}}\",\n        \"addressExtension\": \"{{facilityAddressExtensionCurrent}}\"\n      }\n    ],\n    \"phones\": [\n      {\n        \"number\": \"{{patientPhonePrimary}}\",\n        \"type\": 0,\n        \"extension\": \"\"\n      }\n    ]\n  },\n  \"physician\": {\n    \"npiNumber\": \"{{physicianNpi}}\",\n    \"firstName\": \"{{physicianFirstNameCurrent}}\",\n    \"lastName\": \"{{physicianLastNameCurrent}}\",\n    \"specialtyCode\": \"ENT\",\n    \"specialtyName\": \"Ear Nose Throat\",\n    \"addresses\": [\n      {\n        \"name\": \"Primary Office\",\n        \"streetAddress\": \"{{facilityAddress1}}\",\n        \"city\": \"{{facilityCity}}\",\n        \"state\": {{facilityState}},\n        \"zipCode\": \"{{facilityZip}}\",\n        \"addressExtension\": \"{{facilityAddressExtensionCurrent}}\"\n      }\n    ],\n    \"phones\": [\n      {\n        \"number\": \"73319{{multiAddressToken}}\",\n        \"type\": 1,\n        \"extension\": \"\"\n      }\n    ]\n  }\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
@@ -687,11 +691,61 @@
 							"script": {
 								"type": "text/javascript",
 								"exec": [
+									"const baseUrl = pm.variables.replaceIn('{{base_url}}');",
+									"const apiKey = pm.variables.get('apiKey');",
+									"const npi = pm.variables.get('physicianNpi');",
+									"const associationAddress1 = pm.variables.get('associationFacilityAddress1');",
+									"const associationExtension = pm.variables.get('associationFacilityExtension');",
 									"pm.test('Facility association call succeeds', function () {",
 									"    pm.expect([200, 204]).to.include(pm.response.code);",
 									"});",
-									"pm.collectionVariables.set('facilityAddress1Current', pm.variables.get('associationFacilityAddress1'));",
-									"pm.collectionVariables.set('facilityAddressExtensionCurrent', pm.variables.get('associationFacilityExtension'));"
+									"if (!baseUrl || !apiKey || !npi) {",
+									"    console.warn('Skipping physician lookup validation - missing baseUrl, apiKey, or physicianNpi variable.');",
+									"    return;",
+									"}",
+									"pm.sendRequest({",
+									"    url: `${baseUrl}/api/v1/physicians`,",
+									"    method: 'POST',",
+									"    header: {",
+									"        'Content-Type': 'application/json',",
+									"        'Authorization': `ApiKey ${apiKey}`",
+									"    },",
+									"    body: {",
+									"        mode: 'raw',",
+									"        raw: JSON.stringify({",
+									"            skip: 0,",
+									"            take: 15,",
+									"            search: npi,",
+									"            orderBy: 'string',",
+									"            programId: Number(pm.variables.get('programId')) || 0,",
+									"            facilityId: 0,",
+									"            onlyActiveOffices: true,",
+									"            excludedPhysiciansId: [0]",
+									"        })",
+									"    }",
+									"}, function (err, res) {",
+									"    pm.test('Physician facility lookup succeeded', function () {",
+									"        pm.expect(err, 'Unexpected error from physician lookup').to.be.null;",
+									"        pm.expect(res, 'Physician lookup response missing').to.exist;",
+									"        if (res) {",
+									"            pm.expect(res.code).to.eql(200);",
+									"        }",
+									"    });",
+									"    if (err || !res) {",
+									"        return;",
+									"    }",
+									"    const payload = res.json();",
+									"    const first = payload && payload.value && payload.value[0];",
+									"    const addresses = Array.isArray(first && first.addresses) ? first.addresses : [];",
+									"    const matched = addresses.find(addr => addr && addr.address1 === associationAddress1 && (!associationExtension || addr.address2 === associationExtension));",
+									"    pm.test('New facility address present for physician', function () {",
+									"        pm.expect(matched, 'Expected newly associated facility to be returned by physician search').to.exist;",
+									"    });",
+									"    if (matched) {",
+									"        pm.collectionVariables.set('facilityAddress1Current', matched.address1 || associationAddress1);",
+									"        pm.collectionVariables.set('facilityAddressExtensionCurrent', matched.address2 || associationExtension || '');",
+									"    }",
+									"});"
 								]
 							}
 						}
@@ -748,8 +802,62 @@
 							"script": {
 								"type": "text/javascript",
 								"exec": [
+									"const baseUrl = pm.variables.replaceIn('{{base_url}}');",
+									"const apiKey = pm.variables.get('apiKey');",
+									"const npi = pm.variables.get('physicianNpi');",
+									"const primaryAddress = pm.collectionVariables.get('facilityAddress1Current');",
+									"const primaryExtension = pm.collectionVariables.get('facilityAddressExtensionCurrent');",
+									"const satelliteAddress = pm.variables.get('multiAddressTwo');",
+									"const satelliteExtension = pm.variables.get('multiExtensionTwo');",
 									"pm.test('Multiple address submission succeeds', function () {",
 									"    pm.expect([200, 204]).to.include(pm.response.code);",
+									"});",
+									"if (!baseUrl || !apiKey || !npi) {",
+									"    console.warn('Skipping multi-address verification - missing baseUrl, apiKey, or physicianNpi.');",
+									"    return;",
+									"}",
+									"pm.sendRequest({",
+									"    url: `${baseUrl}/api/v1/physicians`,",
+									"    method: 'POST',",
+									"    header: {",
+									"        'Content-Type': 'application/json',",
+									"        'Authorization': `ApiKey ${apiKey}`",
+									"    },",
+									"    body: {",
+									"        mode: 'raw',",
+									"        raw: JSON.stringify({",
+									"            skip: 0,",
+									"            take: 15,",
+									"            search: npi,",
+									"            orderBy: 'string',",
+									"            programId: Number(pm.variables.get('programId')) || 0,",
+									"            facilityId: 0,",
+									"            onlyActiveOffices: true,",
+									"            excludedPhysiciansId: [0]",
+									"        })",
+									"    }",
+									"}, function (err, res) {",
+									"    pm.test('Physician lookup for multi-address verification succeeded', function () {",
+									"        pm.expect(err, 'Unexpected error from physician lookup').to.be.null;",
+									"        pm.expect(res, 'Physician lookup response missing').to.exist;",
+									"        if (res) {",
+									"            pm.expect(res.code).to.eql(200);",
+									"        }",
+									"    });",
+									"    if (err || !res) {",
+									"        return;",
+									"    }",
+									"    const payload = res.json();",
+									"    const first = payload && payload.value && payload.value[0];",
+									"    const addresses = Array.isArray(first && first.addresses) ? first.addresses : [];",
+									"    pm.test('Primary facility remains associated', function () {",
+									"        const primary = addresses.find(addr => addr && addr.address1 === primaryAddress && (!primaryExtension || addr.address2 === primaryExtension));",
+									"        pm.expect(primary, 'Expected existing primary facility to remain associated').to.exist;",
+									"    });",
+									"    pm.test('Additional facility captured for physician', function () {",
+									"        const secondary = addresses.find(addr => addr && addr.address1 === satelliteAddress && (!satelliteExtension || addr.address2 === satelliteExtension));",
+									"        pm.expect(secondary, 'Expected secondary facility to be returned by physician search').to.exist;",
+									"    });",
 									"});"
 								]
 							}
@@ -787,77 +895,11 @@
 					"response": []
 				},
 				{
-					"name": "12 Success Response Schema Validation",
+					"name": "12 Error Response Schema Validation",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test('Status code indicates success', function () {",
-									"    pm.expect([200, 201, 204]).to.include(pm.response.code);",
-									"});",
-									"if (pm.response.code !== 204) {",
-									"    const json = pm.response.json();",
-									"    const successSchema = {",
-									"      type: 'object',",
-									"      required: ['value', 'code', 'success', 'message'],",
-									"      properties: {",
-									"        value: {",
-									"          type: 'object',",
-									"          required: ['prescriptionId', 'caseId', 'success', 'message'],",
-									"        },",
-									"        code: { type: 'number' },",
-									"        success: { type: 'boolean' },",
-									"        message: { type: 'string' }",
-									"      }",
-									"    };",
-									"    pm.test('Success payload validates against schema', function () {",
-									"        pm.expect(tv4.validate(json, successSchema), JSON.stringify(tv4.error)).to.be.true;",
-									"    });",
-									"}"
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "ApiKey {{apiKey}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": {\n    \"prescriptionNumber\": \"{{prescriptionNumber}}-SCHEMA\",\n    \"ndc\": \"{{prescriptionNdc}}\",\n    \"quantity\": 30\n  },\n  \"patient\": {\n    \"patientId\": {{patientExternalId}},\n    \"firstName\": \"{{patientFirstNameCurrent}}\",\n    \"lastName\": \"{{patientLastNameCurrent}}\"\n  },\n  \"physician\": {\n    \"npiNumber\": \"{{physicianNpi}}\",\n    \"firstName\": \"{{physicianFirstNameCurrent}}\",\n    \"lastName\": \"{{physicianLastNameCurrent}}\"\n  }\n}"
-						},
-						"url": {
-							"raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"caremetx",
-								"prescription-integration"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "13 Error Response Schema Validation",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
 								"exec": [
 									"pm.test('Validation error returns 400', function () {",
 									"    pm.expect(pm.response.code).to.eql(400);",
@@ -880,7 +922,10 @@
 									"pm.test('Error payload lists missing top-level sections', function () {",
 									"    pm.expect(Object.keys(json.errors)).to.include.members(['Patient.LastName', 'Patient.FirstName', 'Physician.LastName', 'Physician.FirstName', 'Physician.NPINumber', 'Prescription.NDC', 'Prescription.Quantity', 'Prescription.PrescriptionNumber']);",
 									"});"
-								]
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -917,290 +962,6 @@
 				}
 			],
 			"description": "Scenario-specific POST requests for /api/v1/caremetx/prescription-integration covering happy path, validation, and data maintenance behaviors."
-		},
-		{
-			"name": "Patient Lookup by External Reference",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"const externalId = pm.variables.get('patientExternalId');",
-							"if (!externalId) {",
-							"    console.warn('patientExternalId not set; run Scenario 02 before using this lookup.');",
-							"    pm.test('Patient lookup skipped (no patientExternalId variable)', function () {",
-							"        pm.expect(true).to.be.true;",
-							"    });",
-							"    return;",
-							"}",
-							"pm.test('Patient lookup succeeded', function () {",
-							"    pm.expect(pm.response.code).to.eql(200);",
-							"});",
-							"const body = pm.response.text();",
-							"pm.test('Patient payload references identifiers', function () {",
-							"    pm.expect(body).to.include(externalId.toString());",
-							"    const expectedFirst = pm.variables.get('patientFirstNameCurrent');",
-							"    const expectedLast = pm.variables.get('patientLastNameCurrent');",
-							"    if (expectedFirst) {",
-							"        pm.expect(body).to.include(expectedFirst);",
-							"    }",
-							"    if (expectedLast) {",
-							"        pm.expect(body).to.include(expectedLast);",
-							"    }",
-							"});"
-						]
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "ApiKey {{apiKey}}"
-					}
-				],
-				"url": {
-					"raw": "{{base_url}}/api/v1/patients/external/{{clientId}}/{{patientExternalId}}",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"patients",
-						"external",
-						"{{clientId}}",
-						"{{patientExternalId}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Physician Lookup by NPI",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"const npi = pm.variables.get('physicianNpi');",
-							"if (!npi) {",
-							"    console.warn('physicianNpi not set; run Scenario 02 before using this lookup.');",
-							"    pm.test('Physician lookup skipped (no physicianNpi variable)', function () {",
-							"        pm.expect(true).to.be.true;",
-							"    });",
-							"    return;",
-							"}",
-							"pm.test('Physician lookup succeeded', function () {",
-							"    pm.expect(pm.response.code).to.eql(200);",
-							"});",
-							"const body = pm.response.text();",
-							"pm.test('Physician payload references identifiers', function () {",
-							"    pm.expect(body).to.include(npi.toString());",
-							"    const expectedFirst = pm.variables.get('physicianFirstNameCurrent');",
-							"    const expectedLast = pm.variables.get('physicianLastNameCurrent');",
-							"    if (expectedFirst) {",
-							"        pm.expect(body).to.include(expectedFirst);",
-							"    }",
-							"    if (expectedLast) {",
-							"        pm.expect(body).to.include(expectedLast);",
-							"    }",
-							"});"
-						]
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "ApiKey {{apiKey}}"
-					}
-				],
-				"url": {
-					"raw": "{{base_url}}/api/v1/physicians/by-npi/{{physicianNpi}}",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"physicians",
-						"by-npi",
-						"{{physicianNpi}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Facility Lookup by Address",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"const address1 = pm.variables.get('facilityAddress1Current') || pm.variables.get('facilityAddress1');",
-							"const state = pm.variables.get('facilityState');",
-							"const zip = pm.variables.get('facilityZip');",
-							"if (!address1 || !state || !zip) {",
-							"    console.warn('Facility address variables not populated; run Scenario 02 first.');",
-							"    pm.test('Facility lookup skipped (address variables missing)', function () {",
-							"        pm.expect(true).to.be.true;",
-							"    });",
-							"    return;",
-							"}",
-							"pm.test('Facility lookup succeeded', function () {",
-							"    pm.expect(pm.response.code).to.eql(200);",
-							"});",
-							"const body = pm.response.text();",
-							"pm.test('Facility payload references key address elements', function () {",
-							"    pm.expect(body).to.include(address1);",
-							"    pm.expect(body).to.include(state.toString());",
-							"    pm.expect(body).to.include(zip.toString());",
-							"});",
-							"const extension = pm.variables.get('facilityAddressExtensionCurrent');",
-							"if (extension) {",
-							"    pm.test('Facility payload reflects latest address extension', function () {",
-							"        pm.expect(body).to.include(extension);",
-							"    });",
-							"}"
-						]
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "ApiKey {{apiKey}}"
-					}
-				],
-				"url": {
-					"raw": "{{base_url}}/api/v1/facilities/search",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"facilities",
-						"search"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Prescription Lookup by Number",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"const rxNumber = pm.variables.get('prescriptionNumber');",
-							"if (!rxNumber) {",
-							"    console.warn('prescriptionNumber not set; run Scenario 02 before using this lookup.');",
-							"    pm.test('Prescription lookup skipped (no prescriptionNumber variable)', function () {",
-							"        pm.expect(true).to.be.true;",
-							"    });",
-							"    return;",
-							"}",
-							"pm.test('Prescription lookup succeeded', function () {",
-							"    pm.expect(pm.response.code).to.eql(200);",
-							"});",
-							"const body = pm.response.text();",
-							"pm.test('Prescription payload references identifiers', function () {",
-							"    pm.expect(body).to.include(rxNumber);",
-							"    const ndc = pm.variables.get('prescriptionNdc');",
-							"    if (ndc) {",
-							"        pm.expect(body).to.include(ndc);",
-							"    }",
-							"});"
-						]
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "ApiKey {{apiKey}}"
-					}
-				],
-				"url": {
-					"raw": "{{base_url}}/api/v1/prescriptions/by-number/{{prescriptionNumber}}",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"prescriptions",
-						"by-number",
-						"{{prescriptionNumber}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Case Lookup by Identifier",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"const caseId = pm.variables.get('lastCaseId');",
-							"if (!caseId) {",
-							"    console.warn('lastCaseId not set; run Scenario 02 before using this lookup.');",
-							"    pm.test('Case lookup skipped (no lastCaseId variable)', function () {",
-							"        pm.expect(true).to.be.true;",
-							"    });",
-							"    return;",
-							"}",
-							"pm.test('Case lookup succeeded', function () {",
-							"    pm.expect(pm.response.code).to.eql(200);",
-							"});",
-							"const body = pm.response.text();",
-							"pm.test('Case payload references last case id', function () {",
-							"    pm.expect(body).to.include(caseId.toString());",
-							"});"
-						]
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "ApiKey {{apiKey}}"
-					}
-				],
-				"url": {
-					"raw": "{{base_url}}/api/v1/cases/{{lastCaseId}}",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"api",
-						"v1",
-						"cases",
-						"{{lastCaseId}}"
-					]
-				}
-			},
-			"response": []
 		}
 	],
 	"variable": [
