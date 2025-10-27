@@ -16,16 +16,17 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"type": "text/javascript",
 								"exec": [
 									"pm.request.headers.upsert({ key: 'Authorization', value: 'ApiKey ' + (pm.variables.get('invalidApiKey') || 'INVALID') });"
-								]
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						},
 						{
 							"listen": "test",
 							"script": {
-								"type": "text/javascript",
 								"exec": [
 									"pm.test('Unauthorized response returns 401', function () {",
 									"    pm.expect(pm.response.code).to.eql(401);",
@@ -37,7 +38,10 @@
 									"        pm.expect(json.status).to.eql(401);",
 									"    });",
 									"}"
-								]
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -50,7 +54,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "ApiKey {{apiKey}}"
+								"value": "{{apiKey}}"
 							}
 						],
 						"body": {
@@ -181,12 +185,12 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "ApiKey {{apiKey}}"
+								"value": "{{apiKey}}"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": {\n    \"prescriptionNumber\": \"{{prescriptionNumber}}\",\n    \"ndc\": \"{{prescriptionNdc}}\",\n    \"quantity\": 30,\n    \"dosage\": \"500 mg\",\n    \"refillsNumber\": 2,\n    \"fillsMade\": 0,\n    \"refillsRemaining\": 2,\n    \"dispenseAsWritten\": true,\n    \"physicianSignature\": true,\n    \"physicianSignatureDate\": \"2025-01-15T00:00:00Z\",\n    \"expirationDate\": \"2026-01-15T00:00:00Z\",\n    \"daysSupply\": 30,\n    \"lastDispenseDate\": \"2024-12-20T00:00:00Z\",\n    \"nextAvailableRefillDate\": \"2025-01-20T00:00:00Z\",\n    \"source\": \"Electronic\"\n  },\n  \"patient\": {\n    \"patientId\": {{patientExternalId}},\n    \"firstName\": \"{{patientFirstNameCurrent}}\",\n    \"lastName\": \"{{patientLastNameCurrent}}\",\n    \"dateOfBirth\": \"1982-05-04T00:00:00Z\",\n    \"gender\": 1,\n    \"languageId\": -1,\n    \"email\": \"{{patientEmail}}\",\n    \"addresses\": [\n      {\n        \"type\": 0,\n        \"streetAddress\": \"{{facilityAddress1}}\",\n        \"city\": \"{{facilityCity}}\",\n        \"state\": {{facilityState}},\n        \"zipCode\": \"{{facilityZip}}\",\n        \"addressExtension\": \"{{facilityAddressExtensionCurrent}}\"\n      }\n    ],\n    \"phones\": [\n      {\n        \"number\": \"{{patientPhonePrimary}}\",\n        \"type\": 0,\n        \"extension\": \"\"\n      }\n    ]\n  },\n  \"physician\": {\n    \"npiNumber\": \"{{physicianNpi}}\",\n    \"firstName\": \"{{physicianFirstNameCurrent}}\",\n    \"lastName\": \"{{physicianLastNameCurrent}}\",\n    \"specialtyCode\": \"ENT\",\n    \"specialtyName\": \"Ear Nose Throat\",\n    \"addresses\": [\n      {\n        \"name\": \"Primary Office\",\n        \"streetAddress\": \"{{facilityAddress1}}\",\n        \"city\": \"{{facilityCity}}\",\n        \"state\": {{facilityState}},\n        \"zipCode\": \"{{facilityZip}}\",\n        \"addressExtension\": \"{{facilityAddressExtensionCurrent}}\"\n      }\n    ],\n    \"phones\": [\n      {\n        \"number\": \"73319{{multiAddressToken}}\",\n        \"type\": 1,\n        \"extension\": \"\"\n      }\n    ]\n  }\n}"
+							"raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": {\n    \"prescriptionNumber\": \"{{prescriptionNumber}}\",\n    \"ndc\": \"{{prescriptionNdc}}\",\n    \"quantity\": 30,\n    \"dosage\": \"500 mg\",\n    \"refillsNumber\": 2,\n    \"fillsMade\": 0,\n    \"refillsRemaining\": 2,\n    \"dispenseAsWritten\": true,\n    \"physicianSignature\": true,\n    \"physicianSignatureDate\": \"2025-01-15T00:00:00Z\",\n    \"expirationDate\": \"2026-01-15T00:00:00Z\",\n    \"daysSupply\": 30,\n    \"lastDispenseDate\": \"2024-12-20T00:00:00Z\",\n    \"nextAvailableRefillDate\": \"2025-01-20T00:00:00Z\",\n    \"source\": \"Electronic\"\n  },\n  \"patient\": {\n    \"patientId\": {{patientExternalId}},\n    \"firstName\": \"{{patientFirstNameCurrent}}\",\n    \"lastName\": \"{{patientLastNameCurrent}}\",\n    \"dateOfBirth\": \"1950-05-04T00:00:00Z\",\n    \"gender\": 1,\n    \"languageId\": -1,\n    \"email\": \"{{patientEmail}}\",\n    \"addresses\": [\n      {\n        \"type\": 0,\n        \"streetAddress\": \"{{facilityAddress1}}\",\n        \"city\": \"{{facilityCity}}\",\n        \"state\": {{facilityState}},\n        \"zipCode\": \"{{facilityZip}}\",\n        \"addressExtension\": \"{{facilityAddressExtensionCurrent}}\"\n      }\n    ],\n    \"phones\": [\n      {\n        \"number\": \"{{patientPhonePrimary}}\",\n        \"type\": 0,\n        \"extension\": \"\"\n      }\n    ]\n  },\n  \"physician\": {\n    \"npiNumber\": \"{{physicianNpi}}\",\n    \"firstName\": \"{{physicianFirstNameCurrent}}\",\n    \"lastName\": \"{{physicianLastNameCurrent}}\",\n    \"specialtyCode\": \"ENT\",\n    \"specialtyName\": \"Ear Nose Throat\",\n    \"addresses\": [\n      {\n        \"name\": \"Primary Office\",\n        \"streetAddress\": \"{{facilityAddress1}}\",\n        \"city\": \"{{facilityCity}}\",\n        \"state\": {{facilityState}},\n        \"zipCode\": \"{{facilityZip}}\",\n        \"addressExtension\": \"{{facilityAddressExtensionCurrent}}\"\n      }\n    ],\n    \"phones\": [\n      {\n        \"contactMethod\" : 0,\n        \"number\": \"73319{{multiAddressToken}}\",\n        \"type\": 1,\n        \"extension\": \"\"\n      }\n    ]\n  }\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
@@ -209,7 +213,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"type": "text/javascript",
 								"exec": [
 									"const suffix = '-' + (Math.floor(Math.random() * 900) + 100);",
 									"const updatedFirst = pm.collectionVariables.get('patientFirstNameOriginal') + suffix;",
@@ -218,13 +221,15 @@
 									"pm.collectionVariables.set('patientLastNameCurrent', updatedLast);",
 									"pm.collectionVariables.set('patientEmail', `caremetx-qa+update${suffix.replace('-', '')}@example.com`);",
 									"pm.collectionVariables.set('patientPhonePrimary', (Math.floor(Math.random() * 9000000000) + 1000000000).toString());"
-								]
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						},
 						{
 							"listen": "test",
 							"script": {
-								"type": "text/javascript",
 								"exec": [
 									"pm.test('Existing patient update succeeds', function () {",
 									"    pm.expect([200, 204]).to.include(pm.response.code);",
@@ -238,7 +243,10 @@
 									"pm.test('Update response message reflects existing prescription handling', function () {",
 									"    pm.expect(json.value.message.toLowerCase()).to.include.oneOf(['updated', 'already exists']);",
 									"});"
-								]
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -251,12 +259,12 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "ApiKey {{apiKey}}"
+								"value": "{{apiKey}}"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": {\n    \"prescriptionNumber\": \"{{prescriptionNumber}}\",\n    \"ndc\": \"{{prescriptionNdc}}\",\n    \"quantity\": 30\n  },\n  \"patient\": {\n    \"patientId\": {{patientExternalId}},\n    \"firstName\": \"{{patientFirstNameCurrent}}\",\n    \"lastName\": \"{{patientLastNameCurrent}}\",\n    \"dateOfBirth\": \"1982-05-04T00:00:00Z\",\n    \"gender\": 1,\n    \"email\": \"{{patientEmail}}\",\n    \"phones\": [\n      {\n        \"number\": \"{{patientPhonePrimary}}\",\n        \"type\": 0\n      }\n    ]\n  },\n  \"physician\": {\n    \"npiNumber\": \"{{physicianNpi}}\",\n    \"firstName\": \"{{physicianFirstNameCurrent}}\",\n    \"lastName\": \"{{physicianLastNameCurrent}}\"\n  }\n}"
+							"raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": {\n    \"prescriptionNumber\": \"{{prescriptionNumber}}\",\n    \"ndc\": \"{{prescriptionNdc}}\",\n    \"quantity\": 30\n  },\n  \"patient\": {\n    \"patientId\": {{patientExternalId}},\n    \"firstName\": \"{{patientFirstNameCurrent}}\",\n    \"lastName\": \"{{patientLastNameCurrent}}\",\n    \"dateOfBirth\": \"1950-05-04T00:00:00Z\",\n    \"gender\": 1,\n    \"email\": \"{{patientEmail}}\",\n    \"phones\": [\n      {\n        \"number\": \"{{patientPhonePrimary}}\",\n        \"type\": 0\n      }\n    ]\n  },\n  \"physician\": {\n    \"npiNumber\": \"{{physicianNpi}}\",\n    \"firstName\": \"{{physicianFirstNameCurrent}}\",\n    \"lastName\": \"{{physicianLastNameCurrent}}\"\n  }\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
@@ -279,18 +287,19 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"type": "text/javascript",
 								"exec": [
 									"const suffix = '-' + (Math.floor(Math.random() * 90) + 10);",
 									"pm.variables.set('physicianFirstNameAttempt', pm.collectionVariables.get('physicianFirstNameOriginal') + suffix);",
 									"pm.variables.set('physicianLastNameAttempt', pm.collectionVariables.get('physicianLastNameOriginal') + suffix);"
-								]
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						},
 						{
 							"listen": "test",
 							"script": {
-								"type": "text/javascript",
 								"exec": [
 									"pm.test('Physician update attempt succeeds', function () {",
 									"    pm.expect([200, 204]).to.include(pm.response.code);",
@@ -334,7 +343,10 @@
 									"        pm.expect(value.lastName).to.eql(pm.collectionVariables.get('physicianLastNameOriginal'));",
 									"    });",
 									"});"
-								]
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -347,7 +359,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "ApiKey {{apiKey}}"
+								"value": "{{apiKey}}"
 							}
 						],
 						"body": {
@@ -375,17 +387,18 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"type": "text/javascript",
 								"exec": [
 									"const extension = `Suite ${Math.floor(Math.random() * 900) + 100}`;",
 									"pm.variables.set('facilityExtensionAttempt', extension);"
-								]
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						},
 						{
 							"listen": "test",
 							"script": {
-								"type": "text/javascript",
 								"exec": [
 									"pm.test('Facility update returns success', function () {",
 									"    pm.expect([200, 204]).to.include(pm.response.code);",
@@ -395,7 +408,10 @@
 									"    pm.expect(json.success).to.eql(true);",
 									"});",
 									"pm.collectionVariables.set('facilityAddressExtensionCurrent', pm.variables.get('facilityExtensionAttempt'));"
-								]
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -408,7 +424,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "ApiKey {{apiKey}}"
+								"value": "{{apiKey}}"
 							}
 						],
 						"body": {
@@ -436,7 +452,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"type": "text/javascript",
 								"exec": [
 									"pm.test('Open case conflict returns 400', function () {",
 									"    pm.expect(pm.response.code).to.eql(400);",
@@ -453,7 +468,10 @@
 									"    const messageText = Array.isArray(json.errors.message) ? json.errors.message.join(' ') : String(json.errors.message || '');",
 									"    pm.expect(messageText.toLowerCase()).to.include('already has an open case');",
 									"});"
-								]
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -466,7 +484,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "ApiKey {{apiKey}}"
+								"value": "{{apiKey}}"
 							}
 						],
 						"body": {
@@ -494,7 +512,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"type": "text/javascript",
 								"exec": [
 									"pm.test('Duplicate submission succeeds', function () {",
 									"    pm.expect([200, 204]).to.include(pm.response.code);",
@@ -503,7 +520,10 @@
 									"pm.test('Duplicate response indicates existing prescription reuse', function () {",
 									"    pm.expect(json.value.message.toLowerCase()).to.include('already exists');",
 									"});"
-								]
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -516,7 +536,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "ApiKey {{apiKey}}"
+								"value": "{{apiKey}}"
 							}
 						],
 						"body": {
@@ -544,7 +564,6 @@
 						{
 							"listen": "test",
 							"script": {
-								"type": "text/javascript",
 								"exec": [
 									"pm.test('Missing required fields return 400', function () {",
 									"    pm.expect(pm.response.code).to.eql(400);",
@@ -567,7 +586,10 @@
 									"pm.test('Error payload highlights missing patient last name', function () {",
 									"    pm.expect(json.errors['Patient.LastName'][0].toLowerCase()).to.include('required');",
 									"});"
-								]
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -580,7 +602,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "ApiKey {{apiKey}}"
+								"value": "{{apiKey}}"
 							}
 						],
 						"body": {
@@ -608,7 +630,6 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"type": "text/javascript",
 								"exec": [
 									"const stamp = Date.now().toString();",
 									"pm.variables.set('minimalPrescriptionNumber', `RX-MIN-${stamp}`);",
@@ -620,13 +641,15 @@
 									"pm.variables.set('minimalPhysicianNpi', (Math.floor(Math.random() * 9000000000) + 1000000000).toString());",
 									"pm.variables.set('minimalPhysicianFirstName', `MiniPhys${stamp.slice(-3)}`);",
 									"pm.variables.set('minimalPhysicianLastName', `Check${stamp.slice(-3)}`);"
-								]
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						},
 						{
 							"listen": "test",
 							"script": {
-								"type": "text/javascript",
 								"exec": [
 									"pm.test('Minimal payload succeeds', function () {",
 									"    pm.expect([200, 204]).to.include(pm.response.code);",
@@ -635,7 +658,10 @@
 									"pm.test('Minimal payload response indicates success', function () {",
 									"    pm.expect(json.success).to.eql(true);",
 									"});"
-								]
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -648,7 +674,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "ApiKey {{apiKey}}"
+								"value": "{{apiKey}}"
 							}
 						],
 						"body": {
@@ -676,20 +702,21 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"type": "text/javascript",
 								"exec": [
 									"const seed = Date.now();",
 									"const facilityAddress1 = `${Math.floor(Math.random() * 900) + 100} Assoc Ave`;",
 									"const facilityExtension = `Floor ${Math.floor(Math.random() * 9) + 1}`;",
 									"pm.variables.set('associationFacilityAddress1', facilityAddress1);",
 									"pm.variables.set('associationFacilityExtension', facilityExtension);"
-								]
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						},
 						{
 							"listen": "test",
 							"script": {
-								"type": "text/javascript",
 								"exec": [
 									"const baseUrl = pm.variables.replaceIn('{{base_url}}');",
 									"const apiKey = pm.variables.get('apiKey');",
@@ -708,7 +735,7 @@
 									"    method: 'POST',",
 									"    header: {",
 									"        'Content-Type': 'application/json',",
-									"        'Authorization': `ApiKey ${apiKey}`",
+									"        'Authorization': `${apiKey}`",
 									"    },",
 									"    body: {",
 									"        mode: 'raw',",
@@ -746,7 +773,10 @@
 									"        pm.collectionVariables.set('facilityAddressExtensionCurrent', matched.address2 || associationExtension || '');",
 									"    }",
 									"});"
-								]
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -759,7 +789,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "ApiKey {{apiKey}}"
+								"value": "{{apiKey}}"
 							}
 						],
 						"body": {
@@ -787,20 +817,21 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"type": "text/javascript",
 								"exec": [
 									"const token = pm.collectionVariables.get('multiAddressToken') || Date.now().toString().slice(-5);",
 									"pm.variables.set('multiAddressOne', `${Math.floor(Math.random() * 900) + 100} Multi Blvd`);",
 									"pm.variables.set('multiAddressTwo', `${Math.floor(Math.random() * 900) + 100} Multi Ct`);",
 									"pm.variables.set('multiExtensionOne', `Suite ${token}`);",
 									"pm.variables.set('multiExtensionTwo', `Floor ${token}`);"
-								]
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						},
 						{
 							"listen": "test",
 							"script": {
-								"type": "text/javascript",
 								"exec": [
 									"const baseUrl = pm.variables.replaceIn('{{base_url}}');",
 									"const apiKey = pm.variables.get('apiKey');",
@@ -821,7 +852,7 @@
 									"    method: 'POST',",
 									"    header: {",
 									"        'Content-Type': 'application/json',",
-									"        'Authorization': `ApiKey ${apiKey}`",
+									"        'Authorization': `${apiKey}`",
 									"    },",
 									"    body: {",
 									"        mode: 'raw',",
@@ -859,7 +890,10 @@
 									"        pm.expect(secondary, 'Expected secondary facility to be returned by physician search').to.exist;",
 									"    });",
 									"});"
-								]
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -872,7 +906,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "ApiKey {{apiKey}}"
+								"value": "{{apiKey}}"
 							}
 						],
 						"body": {
@@ -938,7 +972,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "ApiKey {{apiKey}}"
+								"value": "{{apiKey}}"
 							}
 						],
 						"body": {
@@ -970,6 +1004,32 @@
 					"name": "Cases",
 					"item": [
 						{
+							"name": "Get Case by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{apiKey}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/Case/15",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"Case",
+										"15"
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "Case Json Patch",
 							"request": {
 								"method": "PATCH",
@@ -999,32 +1059,6 @@
 										"v1",
 										"Case",
 										"json-patch",
-										"6"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get Case by ID",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "ApiKey {{apiKey}}",
-										"type": "text"
-									}
-								],
-								"url": {
-									"raw": "{{base_url}}/api/v1/Case/6",
-									"host": [
-										"{{base_url}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"Case",
 										"6"
 									]
 								}
@@ -1067,9 +1101,9 @@
 							"response": []
 						},
 						{
-							"name": "Put Case",
+							"name": "Change Case Statuses",
 							"request": {
-								"method": "PUT",
+								"method": "POST",
 								"header": [
 									{
 										"key": "Authorization",
@@ -1079,7 +1113,41 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"case\": {\r\n        \"id\": 17,\r\n        \"phaseId\": -1,\r\n        \"phase\": \"Unknown\",\r\n        \"statusId\": 1,\r\n        \"status\": {\r\n            \"id\": 1,\r\n            \"name\": \"Pending\",\r\n            \"canBeManuallySet\": false,\r\n            \"subStatuses\": [\r\n                {\r\n                    \"id\": 9,\r\n                    \"name\": \"Missing Information\",\r\n                    \"statusId\": 1,\r\n                    \"canBeManuallySet\": false,\r\n                    \"status\": null,\r\n                    \"subStatusReasons\": []\r\n                }\r\n            ]\r\n        },\r\n        \"subStatusId\": 9,\r\n        \"subStatus\": {\r\n            \"id\": 9,\r\n            \"name\": \"Missing Information\",\r\n            \"statusId\": 1,\r\n            \"canBeManuallySet\": false,\r\n            \"status\": null,\r\n            \"subStatusReasons\": []\r\n        },\r\n        \"subStatusReasonId\": null,\r\n        \"subStatusReason\": null,\r\n        \"queueConfigurationName\": null,\r\n        \"diagnosisId\": null,\r\n        \"diagnosis\": null,\r\n        \"patientId\": 49,\r\n        \"patient\": {\r\n            \"id\": 49,\r\n            \"dateOfBirth\": \"1980-09-29T00:00:00\",\r\n            \"gender\": 1,\r\n            \"socialSecurityNumber\": null,\r\n            \"experienced\": null,\r\n            \"bestMethodToContact\": null,\r\n            \"bestTimeToContact\": null,\r\n            \"currentMailingAddress\": null,\r\n            \"currentMailingAddressId\": null,\r\n            \"currentShippingAddress\": null,\r\n            \"currentShippingAddressId\": null,\r\n            \"currentConsents\": [],\r\n            \"hipaaConsentEndDate\": \"0001-01-01\",\r\n            \"programConsentEndDate\": \"0001-01-01\",\r\n            \"patientInsuranceIds\": [],\r\n            \"clientId\": 1,\r\n            \"legalUSResident\": null,\r\n            \"isHearingImpaired\": null,\r\n            \"languageId\": -1,\r\n            \"language\": {\r\n                \"id\": -1,\r\n                \"name\": \"English\"\r\n            },\r\n            \"languageIds\": [],\r\n            \"isProficientInEnglish\": null,\r\n            \"caregivers\": [],\r\n            \"externalPatientIdentifiers\": [\r\n                \"346\"\r\n            ],\r\n            \"dateWeightTaken\": null,\r\n            \"patientWeight\": null,\r\n            \"needsTranslator\": false,\r\n            \"caregiverId\": 0,\r\n            \"ageCategoryName\": null,\r\n            \"weightUnits\": null,\r\n            \"driversLicenseNumber\": null,\r\n            \"driversLicenseState\": null,\r\n            \"driversLicenseExpirationDate\": null,\r\n            \"middleName\": null,\r\n            \"contactInfos\": [\r\n                {\r\n                    \"name\": null,\r\n                    \"contactString\": \"user@example246.com\",\r\n                    \"countryIso2\": null,\r\n                    \"primary\": false,\r\n                    \"contactMethod\": 2,\r\n                    \"contactType\": null,\r\n                    \"externalSourceContactId\": null\r\n                },\r\n                {\r\n                    \"name\": null,\r\n                    \"contactString\": \"5028021446\",\r\n                    \"countryIso2\": null,\r\n                    \"primary\": false,\r\n                    \"contactMethod\": 0,\r\n                    \"contactType\": 0,\r\n                    \"externalSourceContactId\": null\r\n                }\r\n            ],\r\n            \"firstName\": \"John\",\r\n            \"lastName\": \"testPatient6\"\r\n        },\r\n        \"physicianId\": 16,\r\n        \"physician\": {\r\n            \"id\": 16,\r\n            \"firstName\": \"Jack\",\r\n            \"lastName\": \"testPhysician\",\r\n            \"name\": null,\r\n            \"organizationName\": null,\r\n            \"npi\": \"1234567464\",\r\n            \"physicianSpecialityId\": 16,\r\n            \"physicianSpecialityName\": \"Ear nose throat\",\r\n            \"taxonomies\": [],\r\n            \"addresses\": [\r\n                {\r\n                    \"id\": 3,\r\n                    \"name\": \"Office\",\r\n                    \"countryCode\": null,\r\n                    \"countryName\": null,\r\n                    \"addressPurpose\": null,\r\n                    \"addressType\": null,\r\n                    \"address1\": \"123 Main St\",\r\n                    \"address2\": \"\",\r\n                    \"city\": \"Louisville\",\r\n                    \"state\": \"ME\",\r\n                    \"postalCode\": \"21811\",\r\n                    \"telephoneNumber\": \"7331933440\",\r\n                    \"faxNumber\": null,\r\n                    \"email\": null,\r\n                    \"contactName\": null,\r\n                    \"countryId\": null,\r\n                    \"telephoneExternalSourceContactId\": null,\r\n                    \"faxNumberExternalSourceContactId\": null,\r\n                    \"emailExternalSourceContactId\": null,\r\n                    \"isActive\": true,\r\n                    \"contactInfos\": [],\r\n                    \"officeContactTitleId\": null\r\n                }\r\n            ],\r\n            \"officesCount\": 1,\r\n            \"ptan\": null,\r\n            \"taxId\": null\r\n        },\r\n        \"facilityId\": null,\r\n        \"facility\": null,\r\n        \"siteOfCareFacilityId\": null,\r\n        \"siteOfCareFacility\": null,\r\n        \"facilityContactId\": null,\r\n        \"facilityContact\": null,\r\n        \"specialtyPharmacyId\": null,\r\n        \"specialtyPharmacy\": null,\r\n        \"territory\": null,\r\n        \"prescriptionId\": 17,\r\n        \"prescription\": {\r\n            \"id\": 17,\r\n            \"dosage\": \"4\",\r\n            \"productNDC\": {\r\n                \"id\": 1,\r\n                \"ndc\": null,\r\n                \"description\": null,\r\n                \"dose\": null,\r\n                \"allowCustomFrequency\": false,\r\n                \"allowCustomDispenseAmount\": false,\r\n                \"allowCustomRefillAmount\": false,\r\n                \"productId\": 1,\r\n                \"product\": {\r\n                    \"id\": 1,\r\n                    \"name\": \"Quviviq\",\r\n                    \"code\": null,\r\n                    \"programId\": 1\r\n                }\r\n            },\r\n            \"quantity\": 2,\r\n            \"physicianSignature\": true,\r\n            \"physicianSignatureDate\": \"2025-09-29T00:00:00\",\r\n            \"refillsNumber\": 2,\r\n            \"fillsMade\": null,\r\n            \"refillsRemaining\": null,\r\n            \"dispenseAsWritten\": true,\r\n            \"createDate\": \"2025-10-14T00:00:00\",\r\n            \"expirationDate\": \"2025-09-29T00:00:00\",\r\n            \"rxNumber\": 123457,\r\n            \"rxNotes\": null,\r\n            \"source\": null,\r\n            \"daysSupply\": null,\r\n            \"prescriptionFrequencyId\": null,\r\n            \"prescriptionFrequencyNotes\": null\r\n        },\r\n        \"newCase\": false,\r\n        \"updated\": null,\r\n        \"salesRepId\": null,\r\n        \"salesRep\": null,\r\n        \"isOpen\": true,\r\n        \"canReactivate\": false,\r\n        \"createdDate\": \"2025-10-14T17:37:02.389-04:00\",\r\n        \"enrollmentStartDate\": \"2025-10-14T17:37:02.330015-04:00\",\r\n        \"enrollmentFormReceiptDate\": null,\r\n        \"typeId\": 1,\r\n        \"typeName\": \"Reimbursement\",\r\n        \"pharmacyBenefitManager\": null,\r\n        \"payerCovered\": null,\r\n        \"paRequired\": null,\r\n        \"tasks\": null,\r\n        \"program\": {\r\n            \"clientId\": 1,\r\n            \"clientName\": \"Idorsia\",\r\n            \"canAddNewMedicalPlansOnCaseSideTab\": true,\r\n            \"canAddNewPharmacyPlansOnCaseSideTab\": true,\r\n            \"programRequiresDeviceReturn\": false,\r\n            \"allowMultipleOpenCasesPerPatient\": false,\r\n            \"enrollmentTypeDaysSinceDiscontinued\": null,\r\n            \"closeDiscontinuedCasesDays\": null,\r\n            \"closeCancelledCasesDays\": 0,\r\n            \"fulfillmentConfig\": null,\r\n            \"id\": 1,\r\n            \"name\": \"Q & You\"\r\n        },\r\n        \"programId\": 1,\r\n        \"caseInsurances\": [],\r\n        \"numberPeopleInHousehold\": null,\r\n        \"totalHouseholdIncome\": null,\r\n        \"supportingDocumentation\": null,\r\n        \"otherSupportingDocumentationText\": null,\r\n        \"patientSignature\": null,\r\n        \"patientHasInsurance\": null,\r\n        \"patientSignatureDate\": null,\r\n        \"redirect\": false,\r\n        \"history\": [],\r\n        \"treatmentStartDate\": null,\r\n        \"treatmentEndDate\": null,\r\n        \"customProperties\": [],\r\n        \"complaints\": [],\r\n        \"closedDate\": null,\r\n        \"preferredProductProcurementMethodId\": null,\r\n        \"desiredSiteOfCareTypeId\": null,\r\n        \"diseaseId\": null,\r\n        \"enrollmentTypeId\": null,\r\n        \"enrollmentType\": null,\r\n        \"caseDocumentsInformation\": [],\r\n        \"salesManagerId\": null,\r\n        \"salesManager\": null,\r\n        \"caseManagerId\": null,\r\n        \"caseManager\": null,\r\n        \"accessSpecialistId\": null,\r\n        \"accessSpecialist\": null,\r\n        \"patientAccessLiaisonId\": null,\r\n        \"patientAccessLiaison\": null,\r\n        \"preferredRetailPharmacy\": {\r\n            \"name\": null,\r\n            \"phone\": null,\r\n            \"fax\": null,\r\n            \"ncpdp\": null,\r\n            \"address\": null\r\n        },\r\n        \"requestedProducts\": []\r\n    }\r\n}",
+									"raw": "{\r\n  \"caseId\": 6,\r\n  \"statusId\": 1,\r\n  \"subStatusId\": 8,\r\n  \"subStatusReasonId\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/v1/CaseStatuses",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"CaseStatuses"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Put Case",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{apiKey}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"case\": {\r\n        \"id\": 17,\r\n        \"phaseId\": -1,\r\n        \"phase\": \"Unknown\",\r\n        \"statusId\": 1,\r\n        \"status\": {\r\n            \"id\": 1,\r\n            \"name\": \"Pending\",\r\n            \"canBeManuallySet\": false,\r\n            \"subStatuses\": [\r\n                {\r\n                    \"id\": 9,\r\n                    \"name\": \"Missing Information\",\r\n                    \"statusId\": 1,\r\n                    \"canBeManuallySet\": false,\r\n                    \"status\": null,\r\n                    \"subStatusReasons\": []\r\n                }\r\n            ]\r\n        },\r\n        \"subStatusId\": 9,\r\n        \"subStatus\": {\r\n            \"id\": 9,\r\n            \"name\": \"Missing Information\",\r\n            \"statusId\": 1,\r\n            \"canBeManuallySet\": false,\r\n            \"status\": null,\r\n            \"subStatusReasons\": []\r\n        },\r\n        \"subStatusReasonId\": null,\r\n        \"subStatusReason\": null,\r\n        \"queueConfigurationName\": null,\r\n        \"diagnosisId\": null,\r\n        \"diagnosis\": null,\r\n        \"patientId\": 49,\r\n        \"patient\": {\r\n            \"id\": 49,\r\n            \"dateOfBirth\": \"1980-09-29T00:00:00\",\r\n            \"gender\": 1,\r\n            \"socialSecurityNumber\": null,\r\n            \"experienced\": null,\r\n            \"bestMethodToContact\": null,\r\n            \"bestTimeToContact\": null,\r\n            \"currentMailingAddress\": null,\r\n            \"currentMailingAddressId\": null,\r\n            \"currentShippingAddress\": null,\r\n            \"currentShippingAddressId\": null,\r\n            \"currentConsents\": [],\r\n            \"hipaaConsentEndDate\": \"0001-01-01\",\r\n            \"programConsentEndDate\": \"0001-01-01\",\r\n            \"patientInsuranceIds\": [],\r\n            \"clientId\": 1,\r\n            \"legalUSResident\": null,\r\n            \"isHearingImpaired\": null,\r\n            \"languageId\": -1,\r\n            \"language\": {\r\n                \"id\": -1,\r\n                \"name\": \"English\"\r\n            },\r\n            \"languageIds\": [],\r\n            \"isProficientInEnglish\": null,\r\n            \"caregivers\": [],\r\n            \"externalPatientIdentifiers\": [\r\n                \"346\"\r\n            ],\r\n            \"dateWeightTaken\": null,\r\n            \"patientWeight\": null,\r\n            \"needsTranslator\": false,\r\n            \"caregiverId\": 0,\r\n            \"ageCategoryName\": null,\r\n            \"weightUnits\": null,\r\n            \"driversLicenseNumber\": null,\r\n            \"driversLicenseState\": null,\r\n            \"driversLicenseExpirationDate\": null,\r\n            \"middleName\": null,\r\n            \"contactInfos\": [\r\n                {\r\n                    \"name\": null,\r\n                    \"contactString\": \"user@example246.com\",\r\n                    \"countryIso2\": null,\r\n                    \"primary\": false,\r\n                    \"contactMethod\": 2,\r\n                    \"contactType\": null,\r\n                    \"externalSourceContactId\": null\r\n                },\r\n                {\r\n                    \"name\": null,\r\n                    \"contactString\": \"5028021446\",\r\n                    \"countryIso2\": null,\r\n                    \"primary\": false,\r\n                    \"contactMethod\": 0,\r\n                    \"contactType\": 0,\r\n                    \"externalSourceContactId\": null\r\n                }\r\n            ],\r\n            \"firstName\": \"John\",\r\n            \"lastName\": \"testPatient6\"\r\n        },\r\n        \"physicianId\": 16,\r\n        \"physician\": {\r\n            \"id\": 16,\r\n            \"firstName\": \"Jack\",\r\n            \"lastName\": \"testPhysician\",\r\n            \"name\": null,\r\n            \"organizationName\": null,\r\n            \"npi\": \"1234567464\",\r\n            \"physicianSpecialityId\": 16,\r\n            \"physicianSpecialityName\": \"Ear nose throat\",\r\n            \"taxonomies\": [],\r\n            \"addresses\": [\r\n                {\r\n                    \"id\": 3,\r\n                    \"name\": \"Office\",\r\n                    \"countryCode\": null,\r\n                    \"countryName\": null,\r\n                    \"addressPurpose\": null,\r\n                    \"addressType\": null,\r\n                    \"address1\": \"123 Main St\",\r\n                    \"address2\": \"\",\r\n                    \"city\": \"Louisville\",\r\n                    \"state\": \"ME\",\r\n                    \"postalCode\": \"21811\",\r\n                    \"telephoneNumber\": \"7331933440\",\r\n                    \"faxNumber\": null,\r\n                    \"email\": null,\r\n                    \"contactName\": null,\r\n                    \"countryId\": null,\r\n                    \"telephoneExternalSourceContactId\": null,\r\n                    \"faxNumberExternalSourceContactId\": null,\r\n                    \"emailExternalSourceContactId\": null,\r\n                    \"isActive\": true,\r\n                    \"contactInfos\": [],\r\n                    \"officeContactTitleId\": null\r\n                }\r\n            ],\r\n            \"officesCount\": 1,\r\n            \"ptan\": null,\r\n            \"taxId\": null\r\n        },\r\n        \"facilityId\": null,\r\n        \"facility\": null,\r\n        \"siteOfCareFacilityId\": null,\r\n        \"siteOfCareFacility\": null,\r\n        \"facilityContactId\": null,\r\n        \"facilityContact\": null,\r\n        \"specialtyPharmacyId\": null,\r\n        \"specialtyPharmacy\": null,\r\n        \"territory\": null,\r\n        \"prescriptionId\": 17,\r\n        \"prescription\": {\r\n            \"id\": 17,\r\n            \"dosage\": \"4\",\r\n            \"productNDC\": {\r\n                \"id\": 1,\r\n                \"ndc\": null,\r\n                \"description\": null,\r\n                \"dose\": null,\r\n                \"allowCustomFrequency\": false,\r\n                \"allowCustomDispenseAmount\": false,\r\n                \"allowCustomRefillAmount\": false,\r\n                \"productId\": 1,\r\n                \"product\": {\r\n                    \"id\": 1,\r\n                    \"name\": \"Quviviq\",\r\n                    \"code\": null,\r\n                    \"programId\": 1\r\n                }\r\n            },\r\n            \"quantity\": 2,\r\n            \"physicianSignature\": true,\r\n            \"physicianSignatureDate\": \"2025-09-29T00:00:00\",\r\n            \"refillsNumber\": 2,\r\n            \"fillsMade\": null,\r\n            \"refillsRemaining\": null,\r\n            \"dispenseAsWritten\": true,\r\n            \"createDate\": \"2025-10-14T00:00:00\",\r\n            \"expirationDate\": \"2025-09-29T00:00:00\",\r\n            \"rxNumber\": \"123457\",\r\n            \"rxNotes\": null,\r\n            \"source\": null,\r\n            \"daysSupply\": null,\r\n            \"prescriptionFrequencyId\": null,\r\n            \"prescriptionFrequencyNotes\": null\r\n        },\r\n        \"newCase\": false,\r\n        \"updated\": null,\r\n        \"salesRepId\": null,\r\n        \"salesRep\": null,\r\n        \"isOpen\": true,\r\n        \"canReactivate\": false,\r\n        \"createdDate\": \"2025-10-14T17:37:02.389-04:00\",\r\n        \"enrollmentStartDate\": \"2025-10-14T17:37:02.330015-04:00\",\r\n        \"enrollmentFormReceiptDate\": null,\r\n        \"typeId\": 1,\r\n        \"typeName\": \"Reimbursement\",\r\n        \"pharmacyBenefitManager\": null,\r\n        \"payerCovered\": null,\r\n        \"paRequired\": null,\r\n        \"tasks\": null,\r\n        \"program\": {\r\n            \"clientId\": 1,\r\n            \"clientName\": \"Idorsia\",\r\n            \"canAddNewMedicalPlansOnCaseSideTab\": true,\r\n            \"canAddNewPharmacyPlansOnCaseSideTab\": true,\r\n            \"programRequiresDeviceReturn\": false,\r\n            \"allowMultipleOpenCasesPerPatient\": false,\r\n            \"enrollmentTypeDaysSinceDiscontinued\": null,\r\n            \"closeDiscontinuedCasesDays\": null,\r\n            \"closeCancelledCasesDays\": 0,\r\n            \"fulfillmentConfig\": null,\r\n            \"id\": 1,\r\n            \"name\": \"Q & You\"\r\n        },\r\n        \"programId\": 1,\r\n        \"caseInsurances\": [],\r\n        \"numberPeopleInHousehold\": null,\r\n        \"totalHouseholdIncome\": null,\r\n        \"supportingDocumentation\": null,\r\n        \"otherSupportingDocumentationText\": null,\r\n        \"patientSignature\": null,\r\n        \"patientHasInsurance\": null,\r\n        \"patientSignatureDate\": null,\r\n        \"redirect\": false,\r\n        \"history\": [],\r\n        \"treatmentStartDate\": null,\r\n        \"treatmentEndDate\": null,\r\n        \"customProperties\": [],\r\n        \"complaints\": [],\r\n        \"closedDate\": null,\r\n        \"preferredProductProcurementMethodId\": null,\r\n        \"desiredSiteOfCareTypeId\": null,\r\n        \"diseaseId\": null,\r\n        \"enrollmentTypeId\": null,\r\n        \"enrollmentType\": null,\r\n        \"caseDocumentsInformation\": [],\r\n        \"salesManagerId\": null,\r\n        \"salesManager\": null,\r\n        \"caseManagerId\": null,\r\n        \"caseManager\": null,\r\n        \"accessSpecialistId\": null,\r\n        \"accessSpecialist\": null,\r\n        \"patientAccessLiaisonId\": null,\r\n        \"patientAccessLiaison\": null,\r\n        \"preferredRetailPharmacy\": {\r\n            \"name\": null,\r\n            \"phone\": null,\r\n            \"fax\": null,\r\n            \"ncpdp\": null,\r\n            \"address\": null\r\n        },\r\n        \"requestedProducts\": []\r\n    }\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1172,13 +1240,137 @@
 					]
 				},
 				{
+					"name": "Get Prescription by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{apiKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/Prescriptions/43",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Prescriptions",
+								"43"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Product by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{apiKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/Product/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Product",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Product by ID",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{apiKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"skip\": 0,\r\n  \"take\": 15,\r\n  \"search\": \"\",\r\n  \"orderBy\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/Product/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Product",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Products NDC by ID",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{apiKey}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"skip\": 0,\r\n  \"take\": 15,\r\n  \"search\": \"46318322753\",\r\n  \"orderBy\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/Product/{{programId}}/NDCs/{{productId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Product",
+								"{{programId}}",
+								"NDCs",
+								"{{productId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get Facilities by ID",
 					"request": {
 						"method": "GET",
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "ApiKey {{apiKey}}",
+								"value": "{{apiKey}}",
 								"type": "text"
 							}
 						],
@@ -1230,7 +1422,7 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "ApiKey {{apiKey}}"
+								"value": "{{apiKey}}"
 							}
 						],
 						"body": {
@@ -1252,44 +1444,18 @@
 					"response": []
 				},
 				{
-					"name": "Get Prescription by ID",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "ApiKey {{apiKey}}",
-								"type": "text"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/api/v1/Prescriptions/6",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"Prescriptions",
-								"6"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Get Tasks by Case ID",
 					"request": {
 						"method": "GET",
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "ApiKey {{apiKey}}",
+								"value": "{{apiKey}}",
 								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/v1/CaseTasks/for/6",
+							"raw": "{{base_url}}/api/v1/CaseTasks/for/208",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1298,7 +1464,7 @@
 								"v1",
 								"CaseTasks",
 								"for",
-								"6"
+								"208"
 							]
 						}
 					},
@@ -1311,7 +1477,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "ApiKey {{apiKey}}",
+								"value": "{{apiKey}}",
 								"type": "text"
 							}
 						],
@@ -1331,48 +1497,13 @@
 					"response": []
 				},
 				{
-					"name": "Get Product by ID",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "ApiKey {{apiKey}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n  \"skip\": 0,\r\n  \"take\": 15,\r\n  \"search\": \"\",\r\n  \"orderBy\": \"\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{base_url}}/api/v1/Product/1",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"Product",
-								"1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Get Patient by ID",
 					"request": {
 						"method": "GET",
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "ApiKey {{apiKey}}",
+								"value": "{{apiKey}}",
 								"type": "text"
 							}
 						],
@@ -1398,7 +1529,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "ApiKey {{apiKey}}",
+								"value": "{{apiKey}}",
 								"type": "text"
 							}
 						],
@@ -1424,7 +1555,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "ApiKey {{apiKey}}",
+								"value": "{{apiKey}}",
 								"type": "text"
 							}
 						],
@@ -1491,7 +1622,7 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "ApiKey {{apiKey}}"
+								"value": "{{apiKey}}"
 							}
 						],
 						"body": {
