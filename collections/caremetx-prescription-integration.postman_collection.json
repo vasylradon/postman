@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "499f9b23-9dab-4b55-9e32-dd5cf38f035f",
+		"_postman_id": "72f838d2-8044-4502-801f-437f479c00c3",
 		"name": "Caremetx Prescription Integration",
 		"description": "Automation helpers for exercising POST /api/v1/caremetx/prescription-integration plus lookup calls for downstream verification.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
@@ -86,8 +86,26 @@
 									"const seed = Date.now();",
 									"const short = seed.toString().slice(-5);",
 									"const patientId = Math.floor(Math.random() * 900000) + 100000;",
-									"const patientFirst = `Auto${short}`;",
-									"const patientLast = `Person${short}`;",
+									"",
+									"const firstNames = [",
+									"  \"James\", \"Emma\", \"Liam\", \"Olivia\", \"Noah\", \"Ava\", \"Ethan\", \"Sophia\",",
+									"  \"Mason\", \"Isabella\", \"Logan\", \"Mia\", \"Lucas\", \"Amelia\", \"Elijah\", \"Harper\",",
+									"  \"Oliver\", \"Charlotte\", \"Benjamin\", \"Ella\"",
+									"];",
+									"const lastNames = [",
+									"  \"Smith\", \"Johnson\", \"Brown\", \"Taylor\", \"Anderson\", \"Thomas\", \"Jackson\",",
+									"  \"White\", \"Harris\", \"Martin\", \"Thompson\", \"Garcia\", \"Martinez\", \"Clark\",",
+									"  \"Lewis\", \"Robinson\", \"Walker\", \"Perez\", \"Hall\", \"Young\"",
+									"];",
+									"",
+									"// Pick random name",
+									"const patientFirst = firstNames[Math.floor(Math.random() * firstNames.length)];",
+									"const patientLast = lastNames[Math.floor(Math.random() * lastNames.length)];",
+									"",
+									"// Optional: add short suffix to ensure uniqueness",
+									"const uniqueFirst = `${patientFirst}${short}`;",
+									"const uniqueLast = `${patientLast}${short}`;",
+									"",
 									"const patientPhone = (Math.floor(Math.random() * 9000000000) + 1000000000).toString();",
 									"const physicianNpi = (Math.floor(Math.random() * 9000000000) + 1000000000).toString();",
 									"const physicianFirst = `Phys${short}`;",
@@ -99,11 +117,19 @@
 									"const facilityExtension = `Suite ${short}`;",
 									"const prescriptionNumber = `RX-${seed}`;",
 									"const ndc = (Math.floor(Math.random() * 90000000000) + 10000000000).toString();",
+									"",
 									"pm.collectionVariables.set('patientExternalId', patientId);",
 									"pm.collectionVariables.set('patientFirstNameOriginal', patientFirst);",
 									"pm.collectionVariables.set('patientLastNameOriginal', patientLast);",
 									"pm.collectionVariables.set('patientFirstNameCurrent', patientFirst);",
 									"pm.collectionVariables.set('patientLastNameCurrent', patientLast);",
+									"",
+									"// Optional:",
+									"pm.collectionVariables.set('patientFirstNameOriginal', uniqueFirst);",
+									"pm.collectionVariables.set('patientLastNameOriginal', uniqueLast);",
+									"pm.collectionVariables.set('patientFirstNameCurrent', uniqueFirst);",
+									"pm.collectionVariables.set('patientLastNameCurrent', uniqueLast);",
+									"",
 									"pm.collectionVariables.set('patientPhonePrimary', patientPhone);",
 									"pm.collectionVariables.set('patientEmail', `caremetx-qa+${short}@example.com`);",
 									"pm.collectionVariables.set('physicianNpi', physicianNpi);",
@@ -132,6 +158,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"console.log(\"Generated patient:\", pm.collectionVariables.get('patientFirstNameCurrent'), pm.collectionVariables.get('patientLastNameCurrent'));",
 									"pm.test('Status indicates creation success', function () {",
 									"    pm.expect([200, 201]).to.include(pm.response.code);",
 									"});",
@@ -164,68 +191,69 @@
 									"});",
 									"pm.collectionVariables.set('lastCaseId', json.value.caseId);",
 									"pm.collectionVariables.set('lastPrescriptionId', json.value.prescriptionId);",
-                                                                        "pm.collectionVariables.set('latestSuccessMessage', json.value.message);",
-                                                                        "pm.test('Identifiers captured for downstream verification', function () {",
-                                                                        "    pm.expect(pm.collectionVariables.get('lastCaseId')).to.exist;",
-                                                                        "    pm.expect(pm.collectionVariables.get('lastPrescriptionId')).to.exist;",
-                                                                        "});",
-                                                                        "const caseId = pm.collectionVariables.get('lastCaseId');",
-                                                                        "const baseUrl = pm.variables.replaceIn('{{base_url}}');",
-                                                                        "const authHeader = pm.variables.replaceIn('ApiKey {{apiKey}}');",
-                                                                        "if (!caseId || !baseUrl || baseUrl.includes('{{') || !authHeader || authHeader.includes('{{')) {",
-                                                                        "    console.warn('Skipping case verification lookup due to missing configuration.');",
-                                                                        "} else {",
-                                                                        "    pm.sendRequest({",
-                                                                        "        url: `${baseUrl}/api/v1/Case/${caseId}`,",
-                                                                        "        method: 'GET',",
-                                                                        "        header: { Authorization: authHeader }",
-                                                                        "    }, function (err, res) {",
-                                                                        "        pm.test('Case lookup request succeeds', function () {",
-                                                                        "            pm.expect(err).to.eql(null);",
-                                                                        "            pm.expect(res).to.be.an('object');",
-                                                                        "            pm.expect(res.code).to.eql(200);",
-                                                                        "        });",
-                                                                        "        if (err || !res) {",
-                                                                        "            return;",
-                                                                        "        }",
-                                                                        "        const lookup = res.json();",
-                                                                        "        const caseValue = lookup && lookup.value ? lookup.value : {};",
-                                                                        "        pm.test('Case record exists after prescription intake', function () {",
-                                                                        "            pm.expect(caseValue.id).to.exist;",
-                                                                        "            pm.expect(Number(caseValue.id)).to.eql(Number(caseId));",
-                                                                        "        });",
-                                                                        "        pm.test('Patient record created and matches intake payload', function () {",
-                                                                        "            pm.expect(caseValue).to.have.property('patient');",
-                                                                        "            pm.expect(caseValue.patient).to.be.an('object');",
-                                                                        "            pm.expect(String(caseValue.patient.id)).to.eql(String(pm.collectionVariables.get('patientExternalId')));",
-                                                                        "            pm.expect(caseValue.patient.firstName).to.eql(pm.collectionVariables.get('patientFirstNameOriginal'));",
-                                                                        "            pm.expect(caseValue.patient.lastName).to.eql(pm.collectionVariables.get('patientLastNameOriginal'));",
-                                                                        "        });",
-                                                                        "        pm.test('Physician record created and linked to case', function () {",
-                                                                        "            pm.expect(caseValue).to.have.property('physician');",
-                                                                        "            pm.expect(caseValue.physician).to.be.an('object');",
-                                                                        "            pm.expect(String(caseValue.physician.npi || caseValue.physician.npiNumber)).to.eql(String(pm.collectionVariables.get('physicianNpi')));",
-                                                                        "        });",
-                                                                        "        pm.test('Facility details stored with the case', function () {",
-                                                                        "            const facility = caseValue.facility;",
-                                                                        "            const expectedAddress1 = pm.collectionVariables.get('facilityAddress1');",
-                                                                        "            const physicianAddresses = (caseValue.physician && Array.isArray(caseValue.physician.addresses)) ? caseValue.physician.addresses : [];",
-                                                                        "            const matchesPhysicianAddress = physicianAddresses.some(function (addr) {",
-                                                                        "                const addressLine = (addr.address1 || addr.addressLine1 || '').toLowerCase();",
-                                                                        "                return addressLine && expectedAddress1 && addressLine === expectedAddress1.toLowerCase();",
-                                                                        "            });",
-                                                                        "            pm.expect(Boolean(facility) || matchesPhysicianAddress).to.eql(true);",
-                                                                        "        });",
-                                                                        "        pm.test('Prescription record created and linked to case', function () {",
-                                                                        "            pm.expect(caseValue).to.have.property('prescription');",
-                                                                        "            pm.expect(caseValue.prescription).to.be.an('object');",
-                                                                        "            pm.expect(Number(caseValue.prescription.id)).to.eql(Number(pm.collectionVariables.get('lastPrescriptionId')));",
-                                                                        "            const responseRxNumber = (caseValue.prescription.rxNumber || caseValue.prescription.prescriptionNumber || '').toString();",
-                                                                        "            pm.expect(responseRxNumber).to.eql(pm.collectionVariables.get('prescriptionNumber').toString());",
-                                                                        "        });",
-                                                                        "    });",
-                                                                        "}"
-                                                                ],
+									"pm.collectionVariables.set('latestSuccessMessage', json.value.message);",
+									"pm.test('Identifiers captured for downstream verification', function () {",
+									"    pm.expect(pm.collectionVariables.get('lastCaseId')).to.exist;",
+									"    pm.expect(pm.collectionVariables.get('lastPrescriptionId')).to.exist;",
+									"});",
+									"const caseId = pm.collectionVariables.get('lastCaseId');",
+									"const baseUrl = pm.variables.replaceIn('{{base_url}}');",
+									"const authHeader = pm.variables.replaceIn('{{apiKey}}');",
+									"if (!caseId || !baseUrl || baseUrl.includes('{{') || !authHeader || authHeader.includes('{{')) {",
+									"    console.warn('Skipping case verification lookup due to missing configuration.');",
+									"} else {",
+									"    pm.sendRequest({",
+									"        url: `${baseUrl}/api/v1/Case/${caseId}`,",
+									"        method: 'GET',",
+									"        header: { Authorization: authHeader }",
+									"    }, function (err, res) {",
+									"        pm.test('Case lookup request succeeds', function () {",
+									"            pm.expect(err).to.eql(null);",
+									"            pm.expect(res).to.be.an('object');",
+									"            pm.expect(res.code).to.eql(200);",
+									"        });",
+									"        if (err || !res) {",
+									"            return;",
+									"        }",
+									"        const lookup = res.json();",
+									"        const caseValue = lookup && lookup.value ? lookup.value : {};",
+									"        pm.test('Case record exists after prescription intake', function () {",
+									"            pm.expect(caseValue.id).to.exist;",
+									"            pm.expect(Number(caseValue.id)).to.eql(Number(caseId));",
+									"        });",
+									"        pm.test('Patient record created and matches intake payload', function () {",
+									"            pm.expect(caseValue).to.have.property('patient');",
+									"            pm.expect(caseValue.patient).to.be.an('object');",
+									"            pm.expect(caseValue.patient.externalPatientIdentifiers[0]).to.eql(String(pm.collectionVariables.get('patientExternalId')));",
+									"",
+									"            pm.expect(caseValue.patient.firstName).to.eql(pm.collectionVariables.get('patientFirstNameOriginal'));",
+									"            pm.expect(caseValue.patient.lastName).to.eql(pm.collectionVariables.get('patientLastNameOriginal'));",
+									"        });",
+									"        pm.test('Physician record created and linked to case', function () {",
+									"            pm.expect(caseValue).to.have.property('physician');",
+									"            pm.expect(caseValue.physician).to.be.an('object');",
+									"            pm.expect(String(caseValue.physician.npi || caseValue.physician.npiNumber)).to.eql(String(pm.collectionVariables.get('physicianNpi')));",
+									"        });",
+									"        pm.test('Facility details stored with the case', function () {",
+									"            const facility = caseValue.facility;",
+									"            const expectedAddress1 = pm.collectionVariables.get('facilityAddress1');",
+									"            const physicianAddresses = (caseValue.physician && Array.isArray(caseValue.physician.addresses)) ? caseValue.physician.addresses : [];",
+									"            const matchesPhysicianAddress = physicianAddresses.some(function (addr) {",
+									"                const addressLine = (addr.address1 || addr.addressLine1 || '').toLowerCase();",
+									"                return addressLine && expectedAddress1 && addressLine === expectedAddress1.toLowerCase();",
+									"            });",
+									"            pm.expect(Boolean(facility) || matchesPhysicianAddress).to.eql(true);",
+									"        });",
+									"        pm.test('Prescription record created and linked to case', function () {",
+									"            pm.expect(caseValue).to.have.property('prescription');",
+									"            pm.expect(caseValue.prescription).to.be.an('object');",
+									"            pm.expect(Number(caseValue.prescription.id)).to.eql(Number(pm.collectionVariables.get('lastPrescriptionId')));",
+									"            const responseRxNumber = (caseValue.prescription.rxNumber || caseValue.prescription.prescriptionNumber || '').toString();",
+									"            pm.expect(responseRxNumber).to.eql(pm.collectionVariables.get('prescriptionNumber').toString());",
+									"        });",
+									"    });",
+									"}"
+								],
 								"type": "text/javascript",
 								"packages": {},
 								"requests": {}
@@ -246,7 +274,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": {\n    \"prescriptionNumber\": \"{{prescriptionNumber}}\",\n    \"ndc\": \"{{prescriptionNdc}}\",\n    \"quantity\": 30,\n    \"dosage\": \"500 mg\",\n    \"refillsNumber\": 2,\n    \"fillsMade\": 0,\n    \"refillsRemaining\": 2,\n    \"dispenseAsWritten\": true,\n    \"physicianSignature\": true,\n    \"physicianSignatureDate\": \"2025-01-15T00:00:00Z\",\n    \"expirationDate\": \"2026-01-15T00:00:00Z\",\n    \"daysSupply\": 30,\n    \"lastDispenseDate\": \"2024-12-20T00:00:00Z\",\n    \"nextAvailableRefillDate\": \"2025-01-20T00:00:00Z\",\n    \"source\": \"Electronic\"\n  },\n  \"patient\": {\n    \"patientId\": {{patientExternalId}},\n    \"firstName\": \"{{patientFirstNameCurrent}}\",\n    \"lastName\": \"{{patientLastNameCurrent}}\",\n    \"dateOfBirth\": \"1950-05-04T00:00:00Z\",\n    \"gender\": 1,\n    \"languageId\": -1,\n    \"email\": \"{{patientEmail}}\",\n    \"addresses\": [\n      {\n        \"type\": 0,\n        \"streetAddress\": \"{{facilityAddress1}}\",\n        \"city\": \"{{facilityCity}}\",\n        \"state\": {{facilityState}},\n        \"zipCode\": \"{{facilityZip}}\",\n        \"addressExtension\": \"{{facilityAddressExtensionCurrent}}\"\n      }\n    ],\n    \"phones\": [\n      {\n        \"number\": \"{{patientPhonePrimary}}\",\n        \"type\": 0,\n        \"extension\": \"\"\n      }\n    ]\n  },\n  \"physician\": {\n    \"npiNumber\": \"{{physicianNpi}}\",\n    \"firstName\": \"{{physicianFirstNameCurrent}}\",\n    \"lastName\": \"{{physicianLastNameCurrent}}\",\n    \"specialtyCode\": \"ENT\",\n    \"specialtyName\": \"Ear Nose Throat\",\n    \"addresses\": [\n      {\n        \"name\": \"Primary Office\",\n        \"streetAddress\": \"{{facilityAddress1}}\",\n        \"city\": \"{{facilityCity}}\",\n        \"state\": {{facilityState}},\n        \"zipCode\": \"{{facilityZip}}\",\n        \"addressExtension\": \"{{facilityAddressExtensionCurrent}}\"\n      }\n    ],\n    \"phones\": [\n      {\n        \"contactMethod\" : 0,\n        \"number\": \"73319{{multiAddressToken}}\",\n        \"type\": 1,\n        \"extension\": \"\"\n      }\n    ]\n  }\n}"
+							"raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": {\n    \"prescriptionNumber\": \"{{prescriptionNumber}}\",\n    \"ndc\": \"{{prescriptionNdc}}\",\n    \"quantity\": 30,\n    \"dosage\": \"500 mg\",\n    \"refillsNumber\": 2,\n    \"fillsMade\": 0,\n    \"refillsRemaining\": 2,\n    \"dispenseAsWritten\": true,\n    \"physicianSignature\": true,\n    \"physicianSignatureDate\": \"2025-01-15T00:00:00Z\",\n    \"expirationDate\": \"2026-01-15T00:00:00Z\",\n    \"daysSupply\": 30,\n    \"lastDispenseDate\": \"2024-12-20T00:00:00Z\",\n    \"nextAvailableRefillDate\": \"2025-01-20T00:00:00Z\",\n    \"source\": \"Electronic\"\n  },\n  \"patient\": {\n    \"patientId\": {{patientExternalId}},\n    \"firstName\": \"{{patientFirstNameCurrent}}\",\n    \"lastName\": \"{{patientLastNameCurrent}}\",\n    \"dateOfBirth\": \"1950-05-04T00:00:00Z\",\n    \"gender\": 1,\n    \"languageId\": -1,\n    \"email\": \"{{patientEmail}}\",\n    \"addresses\": [\n      {\n        \"type\": 0,\n        \"streetAddress\": \"{{facilityAddress1}}\",\n        \"city\": \"{{facilityCity}}\",\n        \"state\": {{facilityState}},\n        \"zipCode\": \"{{facilityZip}}\",\n        \"addressExtension\": \"{{facilityAddressExtensionCurrent}}\"\n      }\n    ],\n    \"phones\": [\n      {\n        \"contactMethod\" : 0,\n        \"number\": \"{{patientPhonePrimary}}\",\n        \"type\": 1,\n        \"extension\": \"\"\n      }\n    ]\n  },\n  \"physician\": {\n    \"npiNumber\": \"{{physicianNpi}}\",\n    \"firstName\": \"{{physicianFirstNameCurrent}}\",\n    \"lastName\": \"{{physicianLastNameCurrent}}\",\n    \"specialtyCode\": \"ENT\",\n    \"specialtyName\": \"Ear Nose Throat\",\n    \"addresses\": [\n      {\n        \"name\": \"Primary Office\",\n        \"streetAddress\": \"{{facilityAddress1}}\",\n        \"city\": \"{{facilityCity}}\",\n        \"state\": {{facilityState}},\n        \"zipCode\": \"{{facilityZip}}\",\n        \"addressExtension\": \"{{facilityAddressExtensionCurrent}}\"\n      }\n    ],\n    \"phones\": [\n      {\n        \"contactMethod\" : 0,\n        \"number\": \"73319{{multiAddressToken}}\",\n        \"type\": 1,\n        \"extension\": \"\"\n      }\n    ]\n  }\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
@@ -320,7 +348,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": {\n    \"prescriptionNumber\": \"{{prescriptionNumber}}\",\n    \"ndc\": \"{{prescriptionNdc}}\",\n    \"quantity\": 30\n  },\n  \"patient\": {\n    \"patientId\": {{patientExternalId}},\n    \"firstName\": \"{{patientFirstNameCurrent}}\",\n    \"lastName\": \"{{patientLastNameCurrent}}\",\n    \"dateOfBirth\": \"1950-05-04T00:00:00Z\",\n    \"gender\": 1,\n    \"email\": \"{{patientEmail}}\",\n    \"phones\": [\n      {\n        \"number\": \"{{patientPhonePrimary}}\",\n        \"type\": 0\n      }\n    ]\n  },\n  \"physician\": {\n    \"npiNumber\": \"{{physicianNpi}}\",\n    \"firstName\": \"{{physicianFirstNameCurrent}}\",\n    \"lastName\": \"{{physicianLastNameCurrent}}\"\n  }\n}"
+							"raw": "{\n  \"clientId\": {{clientId}},\n  \"programId\": {{programId}},\n  \"prescription\": {\n    \"prescriptionNumber\": \"{{prescriptionNumber}}\",\n    \"ndc\": \"{{prescriptionNdc}}\",\n    \"quantity\": 30\n  },\n  \"patient\": {\n    \"patientId\": {{patientExternalId}},\n    \"driversLicenseNumber\": \"aa\",\n    \"firstName\": \"{{patientFirstNameCurrent}}\",\n    \"lastName\": \"{{patientLastNameCurrent}}\",\n    \"dateOfBirth\": \"1950-05-04T00:00:00Z\",\n    \"gender\": 1,\n    \"email\": \"{{patientEmail}}\",\n    \"phones\": [\n      {\n        \"number\": \"{{patientPhonePrimary}}\",\n        \"type\": 0\n      }\n    ]\n  },\n  \"physician\": {\n    \"npiNumber\": \"{{physicianNpi}}\",\n    \"firstName\": \"{{physicianFirstNameCurrent}}\",\n    \"lastName\": \"{{physicianLastNameCurrent}}\"\n  }\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/caremetx/prescription-integration",
@@ -372,7 +400,7 @@
 									"    return;",
 									"}",
 									"const npi = pm.collectionVariables.get('physicianNpi') || pm.collectionVariables.get('physicianNpiExisting') || '1234567464';",
-									"const authHeader = pm.variables.replaceIn('ApiKey {{apiKey}}');",
+									"const authHeader = pm.variables.replaceIn('{{apiKey}}');",
 									"if (!authHeader || authHeader.includes('{{')) {",
 									"    console.warn('apiKey variable is not resolved; skipping physician verification lookup.');",
 									"    return;",
@@ -1225,6 +1253,33 @@
 							"response": []
 						},
 						{
+							"name": "Get Tasks by Case ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{apiKey}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/CaseTasks/for/252",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"CaseTasks",
+										"for",
+										"252"
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "Get CaseStatuses",
 							"request": {
 								"method": "GET",
@@ -1500,7 +1555,116 @@
 					"response": []
 				},
 				{
-					"name": "Get Tasks by Case ID",
+					"name": "Get PharmacyBenefitPlans",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Unknown program or client returns 400 or 404', function () {",
+									"    pm.expect([400, 404]).to.include(pm.response.code);",
+									"});",
+									"if (pm.response.text()) {",
+									"    const json = pm.response.json();",
+									"    pm.test('Error references program or client', function () {",
+									"        pm.expect(JSON.stringify(json).toLowerCase()).to.include.oneOf(['program', 'client']);",
+									"    });",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{apiKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"skip\": 0,\n  \"take\": 15,\n  \"search\": \"\",\n  \"orderBy\": \"\",\n  //\"isPBM\": true,\n  //\"isActive\": true,\n  \"searchNamePhone\": \"CVS Medicare\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/PharmacyBenefitPlans/Search",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"PharmacyBenefitPlans",
+								"Search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get PatientInsurance",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Unknown program or client returns 400 or 404', function () {",
+									"    pm.expect([400, 404]).to.include(pm.response.code);",
+									"});",
+									"if (pm.response.text()) {",
+									"    const json = pm.response.json();",
+									"    pm.test('Error references program or client', function () {",
+									"        pm.expect(JSON.stringify(json).toLowerCase()).to.include.oneOf(['program', 'client']);",
+									"    });",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{apiKey}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"skip\": 0,\n  \"take\": 15,\n  \"search\": \"\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/PatientInsurance",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"PatientInsurance"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get PharmacyBenefitPlans by ID",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -1511,16 +1675,20 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/v1/CaseTasks/for/208",
+							"raw": "{{base_url}}/api/v1/PharmacyBenefitPlans?id=11",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"CaseTasks",
-								"for",
-								"208"
+								"PharmacyBenefitPlans"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "11"
+								}
 							]
 						}
 					},
@@ -1630,6 +1798,37 @@
 								{
 									"key": "npi",
 									"value": "{{physicianNpi}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Benefit Verifications by PatientId",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{apiKey}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/BenefitVerification?PatientId=264",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"BenefitVerification"
+							],
+							"query": [
+								{
+									"key": "PatientId",
+									"value": "264"
 								}
 							]
 						}
